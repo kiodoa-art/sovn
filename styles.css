@@ -39,6 +39,18 @@ body {
   color: var(--text);
   background: transparent;
 }
+html.overlay-open,
+body.overlay-open {
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+body.overlay-open {
+  position: fixed;
+  left: 0;
+  right: 0;
+  width: 100%;
+}
+
 
 button, input, textarea { font: inherit; }
 button { cursor: pointer; }
@@ -458,11 +470,18 @@ main { padding: 10px 16px 24px; }
   padding: 0 14px;
   font-weight: 740;
 }
-.modal { display: grid; place-items: end center; padding: 18px; }
+.modal {
+  display: grid;
+  place-items: end center;
+  padding: 18px;
+  overscroll-behavior: none;
+}
 .modal-card {
   width: min(620px, 100%);
   max-height: min(82dvh, 720px);
   overflow: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
   border-radius: 30px;
   background: var(--card-solid);
   box-shadow: var(--shadow);

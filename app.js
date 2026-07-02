@@ -584,6 +584,7 @@ function selectSoundTrack(trackId) {
   activeSoundId = track.id;
   soundNotice = "";
   syncSoundUI();
+  scrollModalToElement($("#soundPlayer"));
 }
 
 function startSound(mode = "now") {
@@ -794,6 +795,8 @@ let breathCycleCount = 0;
 let currentTechnique = null;
 let modalOpener = null;
 let drawerOpener = null;
+let overlayScrollY = 0;
+let overlayScrollLocked = false;
 
 // ─── UTILITIES ───────────────────────────────────────────────────────────────
 
@@ -822,6 +825,41 @@ function getFocusReturnTarget(element) {
 function restoreFocus(element) {
   const target = getFocusReturnTarget(element);
   if (target) requestAnimationFrame(() => target.focus());
+}
+
+function lockPageScroll() {
+  if (overlayScrollLocked) return;
+  overlayScrollY = window.scrollY || window.pageYOffset || 0;
+  document.documentElement.classList.add("overlay-open");
+  document.body.classList.add("overlay-open");
+  document.body.style.top = `-${overlayScrollY}px`;
+  overlayScrollLocked = true;
+}
+
+function unlockPageScroll() {
+  if (!overlayScrollLocked) return;
+  if ($(".modal.open, .drawer.open")) return;
+
+  document.documentElement.classList.remove("overlay-open");
+  document.body.classList.remove("overlay-open");
+  document.body.style.top = "";
+  overlayScrollLocked = false;
+  window.scrollTo({ top: overlayScrollY, left: 0, behavior: "auto" });
+}
+
+function scrollModalToElement(element) {
+  if (!(element instanceof HTMLElement)) return;
+
+  requestAnimationFrame(() => {
+    const card = element.closest(".modal-card");
+    if (!(card instanceof HTMLElement)) return;
+
+    const cardRect = card.getBoundingClientRect();
+    const elementRect = element.getBoundingClientRect();
+    const targetTop = Math.max(0, card.scrollTop + elementRect.top - cardRect.top - 12);
+    const reduceMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
+    card.scrollTo({ top: targetTop, behavior: reduceMotion ? "auto" : "smooth" });
+  });
 }
 
 function navigate(route) {
@@ -1375,6 +1413,7 @@ function openModal(content, opener = document.activeElement) {
   if (!modalBody || !modal) return;
   modalBody.innerHTML = content;
   if (!modal.classList.contains("open")) modalOpener = getFocusReturnTarget(opener);
+  lockPageScroll();
   modal.classList.add("open");
   modal.setAttribute("aria-hidden", "false");
   focusFirstElement(modal);
@@ -1390,6 +1429,7 @@ function closeModal() {
   const wasOpen = modal.classList.contains("open");
   modal.classList.remove("open");
   modal.setAttribute("aria-hidden", "true");
+  unlockPageScroll();
   if (wasOpen) restoreFocus(modalOpener);
   modalOpener = null;
 }
@@ -1665,6 +1705,7 @@ function selectGuidedAudioTrack(trackId) {
 
   clearGuidedAudioPoll();
   syncGuidedAudioUI();
+  scrollModalToElement($("#guidedAudioPlayer"));
 }
 
 function syncGuidedAudioUI() {
@@ -2000,6 +2041,7 @@ function openDrawer(opener = document.activeElement) {
   const d = $("#drawer");
   if (!d) return;
   if (!d.classList.contains("open")) drawerOpener = getFocusReturnTarget(opener);
+  lockPageScroll();
   d.classList.add("open");
   d.setAttribute("aria-hidden", "false");
   focusFirstElement(d);
@@ -2011,6 +2053,7 @@ function closeDrawer() {
   const wasOpen = d.classList.contains("open");
   d.classList.remove("open");
   d.setAttribute("aria-hidden", "true");
+  unlockPageScroll();
   if (wasOpen) restoreFocus(drawerOpener);
   drawerOpener = null;
 }

@@ -25,7 +25,7 @@ Under **Settings → Pages** vælges:
 
 ## Opdatering
 
-Aktuel version: **2.1.0**
+Aktuel version: **2.1.1**
 
 Når appen ændres, skal samme versionsnummer opdateres disse steder:
 
