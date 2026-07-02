@@ -271,26 +271,77 @@ const guidedAudioTracks = [
   }
 ];
 
-// ─── SOUND ENGINE ─────────────────────────────────────────────────────────────
+// ─── BACKGROUND SOUNDS ───────────────────────────────────────────────────────
+
+const SOUND_PREROLL = 10;
+const backgroundSoundTracks = [
+  {
+    id: "white",
+    icon: "〰️",
+    label: "Hvid støj",
+    description: "En jævn lyd, der kan dæmpe forstyrrende lyde omkring dig.",
+    file: "assets/audio/hvid-stoej.mp3"
+  },
+  {
+    id: "rain",
+    icon: "🌧️",
+    label: "Regn",
+    description: "Rolig regn uden pludselige eller kraftige lyde.",
+    file: "assets/audio/regn.mp3"
+  },
+  {
+    id: "forest",
+    icon: "🌲",
+    label: "Skov",
+    description: "Et roligt skovmiljø med vind, blade og afdæmpede naturlyde.",
+    file: "assets/audio/skov.mp3"
+  }
+];
 
 let audioCtx = null;
 let soundNodes = [];
+let generatedSoundToken = 0;
+let backgroundAudioEl = null;
 let activeSoundId = null;
+let soundCountdownTimer = null;
+let soundCountdownPoll = null;
+let soundCountdownUntil = 0;
+let soundUiPoll = null;
+let soundFallbackPlaying = false;
+let soundFallbackPaused = false;
+let soundFallbackStartedAt = 0;
+let soundFallbackElapsed = 0;
+let soundNotice = "";
 let guidedAudioEl = null;
 let activeGuidedAudioId = null;
 let guidedAudioPoll = null;
 let guidedAudioError = "";
 
+function findBackgroundSound(trackId) {
+  return backgroundSoundTracks.find(track => track.id === trackId) || null;
+}
+
+function getBackgroundAudioElement() {
+  if (backgroundAudioEl) return backgroundAudioEl;
+
+  backgroundAudioEl = new Audio();
+  backgroundAudioEl.preload = "metadata";
+  backgroundAudioEl.loop = true;
+  backgroundAudioEl.volume = 0.85;
+
+  ["loadedmetadata", "durationchange", "timeupdate", "play", "pause"].forEach(eventName => {
+    backgroundAudioEl.addEventListener(eventName, syncSoundUI);
+  });
+
+  return backgroundAudioEl;
+}
 
 async function getReadyAudioContext() {
   const AudioContextClass = window.AudioContext || window.webkitAudioContext;
   if (!AudioContextClass) throw new Error("Web Audio API understøttes ikke af denne browser.");
 
   if (!audioCtx || audioCtx.state === "closed") audioCtx = new AudioContextClass();
-
-  if (audioCtx.state === "suspended") {
-    await audioCtx.resume();
-  }
+  if (audioCtx.state === "suspended") await audioCtx.resume();
 
   if (audioCtx.state !== "running") {
     throw new Error(`Lyd kunne ikke startes (status: ${audioCtx.state}).`);
@@ -299,10 +350,32 @@ async function getReadyAudioContext() {
   return audioCtx;
 }
 
-function stopSound() {
-  soundNodes.forEach(n => { try { n.stop(); } catch (_) {} });
+function clearSoundCountdown() {
+  if (soundCountdownTimer) clearTimeout(soundCountdownTimer);
+  if (soundCountdownPoll) clearInterval(soundCountdownPoll);
+  soundCountdownTimer = null;
+  soundCountdownPoll = null;
+  soundCountdownUntil = 0;
+}
+
+function ensureSoundUiPoll() {
+  if (soundUiPoll) return;
+  soundUiPoll = setInterval(syncSoundUI, 500);
+}
+
+function clearSoundUiPoll() {
+  if (soundUiPoll) clearInterval(soundUiPoll);
+  soundUiPoll = null;
+}
+
+function stopGeneratedSound() {
+  generatedSoundToken++;
+  soundNodes.forEach(node => {
+    try { node.stop(); } catch (_) {}
+    try { node.disconnect(); } catch (_) {}
+  });
   soundNodes = [];
-  activeSoundId = null;
+  soundFallbackPlaying = false;
 }
 
 function makeWhiteNoise(ctx) {
@@ -310,6 +383,7 @@ function makeWhiteNoise(ctx) {
   const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
   const data = buffer.getChannelData(0);
   for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
+
   const source = ctx.createBufferSource();
   source.buffer = buffer;
   source.loop = true;
@@ -330,11 +404,11 @@ function makeWhiteNoise(ctx) {
 
 function makeRain(ctx) {
   const nodes = [];
-  // Base white noise for rain texture
   const bufferSize = ctx.sampleRate * 4;
   const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
   const data = buffer.getChannelData(0);
   for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
+
   const source = ctx.createBufferSource();
   source.buffer = buffer;
   source.loop = true;
@@ -353,12 +427,13 @@ function makeRain(ctx) {
   source.start();
   nodes.push(source, filter, gain);
 
-  // Add occasional low rumble
   const rumble = ctx.createOscillator();
   rumble.type = "sine";
   rumble.frequency.value = 55;
+
   const rumbleGain = ctx.createGain();
-  rumbleGain.gain.value = 0.04;
+  rumbleGain.gain.value = 0.035;
+
   rumble.connect(rumbleGain);
   rumbleGain.connect(ctx.destination);
   rumble.start();
@@ -367,13 +442,13 @@ function makeRain(ctx) {
   return nodes;
 }
 
-function makeForest(ctx) {
+function makeForest(ctx, token) {
   const nodes = [];
-  // Soft wind base
   const bufferSize = ctx.sampleRate * 4;
   const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
   const data = buffer.getChannelData(0);
   for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
+
   const source = ctx.createBufferSource();
   source.buffer = buffer;
   source.loop = true;
@@ -391,9 +466,9 @@ function makeForest(ctx) {
   source.start();
   nodes.push(source, filter, gain);
 
-  // Birdsong: simple sine pings at nature-like intervals
-  function scheduleChirp() {
-    if (activeSoundId !== "forest") return;
+  const scheduleChirp = () => {
+    if (token !== generatedSoundToken || activeSoundId !== "forest" || !soundFallbackPlaying) return;
+
     const osc = ctx.createOscillator();
     osc.type = "sine";
     const baseFreq = 1800 + Math.random() * 1200;
@@ -401,49 +476,310 @@ function makeForest(ctx) {
     osc.frequency.linearRampToValueAtTime(baseFreq * 1.15, ctx.currentTime + 0.06);
     osc.frequency.linearRampToValueAtTime(baseFreq, ctx.currentTime + 0.12);
 
-    const g = ctx.createGain();
-    g.gain.setValueAtTime(0, ctx.currentTime);
-    g.gain.linearRampToValueAtTime(0.07, ctx.currentTime + 0.03);
-    g.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.14);
+    const chirpGain = ctx.createGain();
+    chirpGain.gain.setValueAtTime(0, ctx.currentTime);
+    chirpGain.gain.linearRampToValueAtTime(0.06, ctx.currentTime + 0.03);
+    chirpGain.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.14);
 
-    osc.connect(g);
-    g.connect(ctx.destination);
+    osc.connect(chirpGain);
+    chirpGain.connect(ctx.destination);
     osc.start(ctx.currentTime);
     osc.stop(ctx.currentTime + 0.2);
 
-    const nextIn = 1800 + Math.random() * 3000;
-    setTimeout(scheduleChirp, nextIn);
-  }
-  setTimeout(scheduleChirp, 800);
+    setTimeout(scheduleChirp, 1800 + Math.random() * 3000);
+  };
 
+  setTimeout(scheduleChirp, 800);
   return nodes;
 }
 
-async function playSound(id) {
-  if (activeSoundId === id) {
-    stopSound();
-    return { ok: true, playing: false };
+async function startGeneratedSound(id) {
+  const ctx = await getReadyAudioContext();
+  stopGeneratedSound();
+  const token = generatedSoundToken;
+
+  if (id === "white") soundNodes = makeWhiteNoise(ctx);
+  else if (id === "rain") soundNodes = makeRain(ctx);
+  else if (id === "forest") soundNodes = makeForest(ctx, token);
+  else throw new Error("Ukendt lydvalg.");
+
+  soundFallbackPlaying = true;
+  soundFallbackPaused = false;
+  soundFallbackStartedAt = Date.now() - soundFallbackElapsed * 1000;
+}
+
+function stopSound(resetSelection = true) {
+  clearSoundCountdown();
+  clearSoundUiPoll();
+
+  const audio = backgroundAudioEl;
+  if (audio) {
+    audio.pause();
+    try { audio.currentTime = 0; } catch (_) {}
+    if (resetSelection) {
+      audio.removeAttribute("src");
+      audio.load();
+    }
+  }
+
+  stopGeneratedSound();
+  soundFallbackPaused = false;
+  soundFallbackElapsed = 0;
+  soundFallbackStartedAt = 0;
+  soundNotice = "";
+
+  if (resetSelection) activeSoundId = null;
+  syncSoundUI();
+}
+
+async function beginSoundPlayback(restart = true) {
+  const track = findBackgroundSound(activeSoundId);
+  if (!track) return;
+
+  stopGuidedAudio(true);
+  clearSoundCountdown();
+  soundNotice = "";
+  soundFallbackElapsed = restart ? 0 : soundFallbackElapsed;
+
+  const audio = getBackgroundAudioElement();
+  stopGeneratedSound();
+  audio.pause();
+
+  try {
+    const currentSource = audio.getAttribute("src") || "";
+    if (currentSource !== track.file) {
+      audio.src = track.file;
+      audio.load();
+      await waitForAudioMetadata(audio);
+    }
+
+    if (restart || audio.ended) audio.currentTime = 0;
+    audio.loop = true;
+    await audio.play();
+    soundFallbackPaused = false;
+  } catch (error) {
+    console.warn(`${APP_NAME} kunne ikke indlæse ${track.file}; bruger midlertidig lyd:`, error);
+    audio.pause();
+    audio.removeAttribute("src");
+    audio.load();
+
+    try {
+      await startGeneratedSound(track.id);
+      soundNotice = "MP3-filen er ikke lagt ind endnu. Der afspilles en midlertidig lyd.";
+    } catch (fallbackError) {
+      console.warn(`${APP_NAME} kunne ikke starte baggrundslyd:`, fallbackError);
+      soundNotice = "Lyden kunne ikke startes. Tjek telefonens lydindstillinger og prøv igen.";
+    }
+  }
+
+  ensureSoundUiPoll();
+  syncSoundUI();
+}
+
+function selectSoundTrack(trackId) {
+  const track = findBackgroundSound(trackId);
+  if (!track) return;
+
+  stopSound(true);
+  activeSoundId = track.id;
+  soundNotice = "";
+  syncSoundUI();
+}
+
+function startSound(mode = "now") {
+  if (!findBackgroundSound(activeSoundId)) return;
+
+  if (mode === "delay") {
+    stopSound(false);
+    soundCountdownUntil = Date.now() + SOUND_PREROLL * 1000;
+    soundCountdownTimer = setTimeout(() => beginSoundPlayback(true), SOUND_PREROLL * 1000);
+    soundCountdownPoll = setInterval(syncSoundUI, 200);
+    syncSoundUI();
+    return;
+  }
+
+  beginSoundPlayback(true);
+}
+
+async function toggleSoundPlayback() {
+  if (!findBackgroundSound(activeSoundId)) return;
+
+  if (soundCountdownUntil) {
+    clearSoundCountdown();
+    syncSoundUI();
+    return;
+  }
+
+  if (soundFallbackPlaying) {
+    soundFallbackElapsed = Math.max(0, (Date.now() - soundFallbackStartedAt) / 1000);
+    stopGeneratedSound();
+    soundFallbackPaused = true;
+    syncSoundUI();
+    return;
+  }
+
+  if (soundFallbackPaused) {
+    try {
+      await startGeneratedSound(activeSoundId);
+      ensureSoundUiPoll();
+    } catch (error) {
+      soundNotice = "Lyden kunne ikke fortsætte på denne enhed.";
+    }
+    syncSoundUI();
+    return;
+  }
+
+  const audio = getBackgroundAudioElement();
+  if (!audio.getAttribute("src")) {
+    await beginSoundPlayback(false);
+    return;
   }
 
   try {
-    const ctx = await getReadyAudioContext();
-    stopSound();
-
-    if (id === "white") soundNodes = makeWhiteNoise(ctx);
-    else if (id === "rain") soundNodes = makeRain(ctx);
-    else if (id === "forest") soundNodes = makeForest(ctx);
-    else throw new Error("Ukendt lydvalg.");
-
-    activeSoundId = id;
-    return { ok: true, playing: true };
+    if (audio.paused) await audio.play();
+    else audio.pause();
   } catch (error) {
-    stopSound();
-    console.warn(`${APP_NAME} kunne ikke starte lyd:`, error);
-    return {
-      ok: false,
-      playing: false,
-      message: "Lyden kunne ikke startes. Tryk igen, eller tjek browserens lydtilladelse."
-    };
+    soundNotice = "Lyden kunne ikke fortsætte. Tryk på Start nu og prøv igen.";
+  }
+  syncSoundUI();
+}
+
+async function restartSound() {
+  if (!findBackgroundSound(activeSoundId)) return;
+
+  clearSoundCountdown();
+  soundFallbackElapsed = 0;
+  soundFallbackStartedAt = Date.now();
+
+  if (soundFallbackPlaying || soundFallbackPaused) {
+    try {
+      await startGeneratedSound(activeSoundId);
+      ensureSoundUiPoll();
+    } catch (error) {
+      soundNotice = "Lyden kunne ikke startes forfra på denne enhed.";
+    }
+    syncSoundUI();
+    return;
+  }
+
+  const audio = getBackgroundAudioElement();
+  if (!audio.getAttribute("src")) {
+    await beginSoundPlayback(true);
+    return;
+  }
+
+  try {
+    audio.currentTime = 0;
+    await audio.play();
+  } catch (error) {
+    soundNotice = "Lyden kunne ikke startes forfra på denne enhed.";
+  }
+  syncSoundUI();
+}
+
+function stopSoundPlayback() {
+  stopSound(false);
+  soundNotice = "Lyden er stoppet. Vælg Start nu eller Start om 10 sekunder for at begynde igen.";
+  syncSoundUI();
+}
+
+function syncSoundUI() {
+  const track = findBackgroundSound(activeSoundId);
+  const audio = backgroundAudioEl;
+  const player = $("#soundPlayer");
+  const icon = $("#soundPlayerIcon");
+  const title = $("#soundPlayerTitle");
+  const meta = $("#soundPlayerMeta");
+  const status = $("#soundStatus");
+  const progress = $("#soundProgress");
+  const current = $("#soundCurrent");
+  const total = $("#soundTotal");
+  const startNowBtn = $("#soundStartNowBtn");
+  const startDelayedBtn = $("#soundStartDelayedBtn");
+  const playPauseBtn = $("#soundPlayPauseBtn");
+  const restartBtn = $("#soundRestartBtn");
+  const stopBtn = $("#soundStopBtn");
+  const countdownWrap = $("#soundCountdown");
+  const countdownNumber = $("#soundCountdownNumber");
+  const countdownCircle = $("#soundCountdownCircle");
+
+  $$("[data-sound]").forEach(button => {
+    button.classList.toggle("sound-active", button.dataset.sound === activeSoundId);
+  });
+
+  if (!player) return;
+
+  if (!track) {
+    if (icon) icon.textContent = "🎧";
+    if (title) title.textContent = "Vælg en baggrundslyd";
+    if (meta) meta.textContent = "Vælg hvid støj, regn eller skov.";
+    if (status) status.textContent = "Ingen lyd valgt endnu.";
+    if (progress) progress.style.width = "0%";
+    if (current) current.textContent = "0:00";
+    if (total) total.textContent = "0:00";
+    if (startNowBtn) startNowBtn.disabled = true;
+    if (startDelayedBtn) startDelayedBtn.disabled = true;
+    if (playPauseBtn) { playPauseBtn.disabled = true; playPauseBtn.textContent = "Pause"; }
+    if (restartBtn) restartBtn.disabled = true;
+    if (stopBtn) stopBtn.disabled = true;
+    if (countdownWrap) countdownWrap.hidden = true;
+    return;
+  }
+
+  const countdownActive = soundCountdownUntil > Date.now();
+  const fileHasSource = Boolean(audio?.getAttribute("src"));
+  const filePlaying = Boolean(fileHasSource && audio && !audio.paused);
+  const filePaused = Boolean(fileHasSource && audio?.paused);
+  const fallbackActive = soundFallbackPlaying || soundFallbackPaused;
+  const isPlaying = filePlaying || soundFallbackPlaying;
+  const canControl = fileHasSource || fallbackActive;
+
+  if (icon) icon.textContent = track.icon;
+  if (title) title.textContent = track.label;
+  if (meta) meta.textContent = `${track.description} Lyden gentages, indtil du stopper den.`;
+
+  if (startNowBtn) startNowBtn.disabled = countdownActive;
+  if (startDelayedBtn) startDelayedBtn.disabled = countdownActive;
+  if (playPauseBtn) {
+    playPauseBtn.disabled = !canControl && !countdownActive;
+    playPauseBtn.textContent = countdownActive ? "Annuller" : isPlaying ? "Pause" : "Fortsæt";
+  }
+  if (restartBtn) restartBtn.disabled = !canControl;
+  if (stopBtn) stopBtn.disabled = !canControl && !countdownActive;
+
+  if (countdownWrap) countdownWrap.hidden = !countdownActive;
+  if (countdownActive) {
+    const remainingMs = Math.max(0, soundCountdownUntil - Date.now());
+    const remaining = Math.max(1, Math.ceil(remainingMs / 1000));
+    const elapsedPct = Math.min(100, Math.max(0, ((SOUND_PREROLL * 1000 - remainingMs) / (SOUND_PREROLL * 1000)) * 100));
+    if (countdownNumber) countdownNumber.textContent = String(remaining);
+    if (countdownCircle) countdownCircle.style.setProperty("--progress", String(elapsedPct));
+  }
+
+  if (fileHasSource && audio && Number.isFinite(audio.duration) && audio.duration > 0) {
+    const pct = Math.min(100, (audio.currentTime / audio.duration) * 100);
+    if (progress) progress.style.width = `${pct}%`;
+    if (current) current.textContent = formatMediaTime(audio.currentTime);
+    if (total) total.textContent = formatMediaTime(audio.duration);
+  } else if (fallbackActive) {
+    const elapsed = soundFallbackPlaying
+      ? Math.max(0, (Date.now() - soundFallbackStartedAt) / 1000)
+      : soundFallbackElapsed;
+    if (progress) progress.style.width = "0%";
+    if (current) current.textContent = formatMediaTime(elapsed);
+    if (total) total.textContent = "Løkke";
+  } else {
+    if (progress) progress.style.width = "0%";
+    if (current) current.textContent = "0:00";
+    if (total) total.textContent = "0:00";
+  }
+
+  if (status) {
+    if (soundNotice) status.textContent = soundNotice;
+    else if (countdownActive) status.textContent = "Du kan lægge telefonen fra dig nu. Lyden starter om et øjeblik.";
+    else if (isPlaying) status.textContent = `${track.label} spiller i en rolig løkke…`;
+    else if (filePaused || soundFallbackPaused) status.textContent = "Lyden er sat på pause.";
+    else status.textContent = "Klar. Vælg Start nu eller Start om 10 sekunder.";
   }
 }
 
@@ -1049,7 +1385,6 @@ function closeModal() {
   stopSound();
   stopGuidedAudio(true);
   document.removeEventListener("click", handleBreathTechniqueClick);
-  document.removeEventListener("click", handleSoundClick);
   const modal = $("#toolModal");
   if (!modal) return;
   const wasOpen = modal.classList.contains("open");
@@ -1172,55 +1507,66 @@ function handleBreathTechniqueClick(event) {
 
 function openSoundModal() {
   openModal(`
-    <p class="eyebrow">Lydmiljø</p>
-    <h2 id="modalTitle">Vælg baggrundslyd</h2>
-    <p>Tryk for at starte eller stoppe. Lyden spiller videre, mens du bruger appen.</p>
-    <div class="sound-grid">
-      <button class="sound-btn" data-sound="white" type="button">
-        <span class="sound-icon">〰</span>
-        <strong>Hvid støj</strong>
-        <small>Jævn, dæmpende baggrundslyd.</small>
-      </button>
-      <button class="sound-btn" data-sound="rain" type="button">
-        <span class="sound-icon">🌧</span>
-        <strong>Regn</strong>
-        <small>Blødt regndryp med dæmpet torden.</small>
-      </button>
-      <button class="sound-btn" data-sound="forest" type="button">
-        <span class="sound-icon">🌲</span>
-        <strong>Skov</strong>
-        <small>Sagte vind og fuglekvidder.</small>
-      </button>
+    <p class="eyebrow">Baggrundslyd</p>
+    <h2 id="modalTitle">Læg telefonen fra dig og lyt</h2>
+    <p>Vælg et lydmiljø. Start med det samme, eller giv dig selv 10 sekunder til at lægge telefonen fra dig.</p>
+    <div class="sound-grid" aria-label="Baggrundslyde">
+      ${backgroundSoundTracks.map(track => `
+        <button class="sound-btn" data-sound="${track.id}" type="button" aria-label="${track.label}">
+          <span class="sound-icon" aria-hidden="true">${track.icon}</span>
+          <strong>${track.label}</strong>
+          <small>${track.description}</small>
+        </button>
+      `).join("")}
     </div>
-    <p id="soundStatus" class="save-status" style="margin-top:10px"></p>
+    <section class="guided-player" id="soundPlayer" aria-live="polite">
+      <div class="guided-countdown" id="soundCountdown" hidden>
+        <div class="guided-countdown-circle" id="soundCountdownCircle">
+          <div class="guided-countdown-inner">
+            <strong id="soundCountdownNumber">10</strong>
+            <span>starter om</span>
+          </div>
+        </div>
+        <p class="guided-countdown-note">Du kan lægge telefonen fra dig nu.</p>
+      </div>
+      <div class="guided-player-head">
+        <div class="guided-player-title-wrap">
+          <span id="soundPlayerIcon" class="guided-player-icon" aria-hidden="true">🎧</span>
+          <div>
+            <p class="guided-player-kicker">Valgt baggrundslyd</p>
+            <h3 id="soundPlayerTitle">Vælg en baggrundslyd</h3>
+          </div>
+        </div>
+        <p id="soundPlayerMeta" class="guided-audio-meta">Vælg hvid støj, regn eller skov.</p>
+      </div>
+      <div class="guided-progress-track"><div class="guided-progress-fill" id="soundProgress"></div></div>
+      <div class="guided-time-row">
+        <span id="soundCurrent">0:00</span>
+        <span id="soundTotal">0:00</span>
+      </div>
+      <div class="guided-start-row">
+        <button class="primary-button" id="soundStartNowBtn" type="button" disabled>Start nu</button>
+        <button class="secondary-button" id="soundStartDelayedBtn" type="button" disabled>Start om 10 sek.</button>
+      </div>
+      <div class="guided-controls">
+        <button class="secondary-button" id="soundPlayPauseBtn" type="button" disabled>Pause</button>
+        <button class="secondary-button" id="soundRestartBtn" type="button" disabled>Start forfra</button>
+        <button class="ghost-button" id="soundStopBtn" type="button" disabled>Stop</button>
+      </div>
+      <p id="soundStatus" class="guided-player-status">Ingen lyd valgt endnu.</p>
+    </section>
   `);
 
-  document.addEventListener("click", handleSoundClick);
-}
+  $$("[data-sound]").forEach(button => {
+    button.addEventListener("click", () => selectSoundTrack(button.dataset.sound));
+  });
+  $("#soundStartNowBtn")?.addEventListener("click", () => startSound("now"));
+  $("#soundStartDelayedBtn")?.addEventListener("click", () => startSound("delay"));
+  $("#soundPlayPauseBtn")?.addEventListener("click", toggleSoundPlayback);
+  $("#soundRestartBtn")?.addEventListener("click", restartSound);
+  $("#soundStopBtn")?.addEventListener("click", stopSoundPlayback);
 
-async function handleSoundClick(event) {
-  const target = event.target instanceof Element ? event.target : null;
-  const btn = target?.closest("[data-sound]");
-  if (!btn) return;
-
-  const id = btn.dataset.sound;
-  const result = await playSound(id);
-  const status = $("#soundStatus");
-  const labels = { white: "Hvid støj", rain: "Regn", forest: "Skov" };
-
-  if (!result.ok) {
-    if (status) status.textContent = result.message;
-    $$(".sound-btn").forEach(button => button.classList.remove("sound-active"));
-    return;
-  }
-
-  if (result.playing && activeSoundId) {
-    if (status) status.textContent = `▶ ${labels[activeSoundId]} spiller…`;
-    $$(".sound-btn").forEach(button => button.classList.toggle("sound-active", button.dataset.sound === activeSoundId));
-  } else {
-    if (status) status.textContent = "Lyden er stoppet.";
-    $$(".sound-btn").forEach(button => button.classList.remove("sound-active"));
-  }
+  syncSoundUI();
 }
 
 // ─── GUIDED AUDIO ────────────────────────────────────────────────────────────

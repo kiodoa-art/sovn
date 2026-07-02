@@ -25,7 +25,7 @@ Under **Settings → Pages** vælges:
 
 ## Opdatering
 
-Aktuel version: **2.0.0**
+Aktuel version: **2.1.0**
 
 Når appen ændres, skal samme versionsnummer opdateres disse steder:
 
@@ -33,6 +33,16 @@ Når appen ændres, skal samme versionsnummer opdateres disse steder:
 - `CACHE_VERSION` og filreferencernes query-strings i `sw.js`
 
 Det sikrer, at installerede PWA-versioner henter den nye cache. Service workeren aktiveres automatisk, hvorefter appen genindlæses.
+
+## Baggrundslyde
+
+Baggrundsafspilleren er klargjort til tre MP3-filer i `assets/audio/`:
+
+- `hvid-stoej.mp3`
+- `regn.mp3`
+- `skov.mp3`
+
+Indtil filerne lægges ind, bruger appen de tidligere genererede lyde som midlertidig fallback. Når MP3-filerne tilføjes, bruges de automatisk. Ved den endelige lydopdatering bør filerne også føjes til `APP_SHELL` i `sw.js`, og versionsnummeret skal bumpes igen, så de bliver tilgængelige offline med det samme.
 
 ## Projektstruktur
 
