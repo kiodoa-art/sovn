@@ -8,6 +8,7 @@ const DIARY_DB_VERSION = 1;
 const DIARY_STORE = "diaryEntries";
 let diaryDbPromise = null;
 let diaryMigrationPromise = null;
+let reminderTimeoutId = null;
 
 // ─── STEPPER DATA ────────────────────────────────────────────────────────────
 
@@ -593,7 +594,8 @@ function getStreakCount(streakData) {
   let count = 0;
   const today = getTodayKey();
   let d = new Date(today);
-  while (true) {
+  const maxDays = 3650;
+  while (count < maxDays) {
     const key = d.toISOString().slice(0, 10);
     if (!streakData[key]) break;
     count++;
@@ -674,6 +676,9 @@ function clearPlan() {
 
 function setupReminder() {
   $("#setReminder")?.addEventListener("click", async () => {
+    clearTimeout(reminderTimeoutId);
+    reminderTimeoutId = null;
+
     const timeVal = $("#reminderTime")?.value;
     const status = $("#reminderStatus");
     if (!status) return;
@@ -700,7 +705,8 @@ function setupReminder() {
     if (target <= now) target.setDate(target.getDate() + 1);
     const msUntil = target - now;
 
-    setTimeout(() => {
+    reminderTimeoutId = setTimeout(() => {
+      reminderTimeoutId = null;
       try {
         new Notification("Søvnro – Sengetid 🌙", {
           body: "Det er snart tid til at finde ro og gøre klar til at sove.",
@@ -975,6 +981,16 @@ function renderDiaryChart(entries) {
   `;
 }
 
+function escapeHtml(str) {
+  return String(str ?? "").replace(/[&<>"']/g, char => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;"
+  })[char]);
+}
+
 function renderDiaryList(entries) {
   const list = $("#diaryList");
   if (!list) return;
@@ -985,6 +1001,9 @@ function renderDiaryList(entries) {
 
   list.innerHTML = entries.map(entry => {
     const hours = calcSleepHours(entry.bedTime, entry.wakeTime);
+    const safeBedTime = escapeHtml(entry.bedTime);
+    const safeWakeTime = escapeHtml(entry.wakeTime);
+    const safeNote = escapeHtml(entry.note);
     const dateStr = new Date(`${entry.date}T00:00:00`).toLocaleDateString("da-DK", {
       weekday: "short",
       day: "numeric",
@@ -995,14 +1014,14 @@ function renderDiaryList(entries) {
         <div class="diary-entry-head">
           <strong>${dateStr}</strong>
           <span class="diary-meta">
-            ${entry.bedTime ? `Lagde mig ${entry.bedTime}` : ""}
+            ${entry.bedTime ? `Lagde mig ${safeBedTime}` : ""}
             ${entry.bedTime && entry.wakeTime ? " · " : ""}
-            ${entry.wakeTime ? `Stod op ${entry.wakeTime}` : ""}
+            ${entry.wakeTime ? `Stod op ${safeWakeTime}` : ""}
             ${hours ? ` · ${hours} timer` : ""}
           </span>
         </div>
         ${entry.quality ? `<div class="diary-quality">${qualityEmoji(entry.quality)} ${qualityLabel(entry.quality)}</div>` : ""}
-        ${entry.note ? `<p class="diary-note">${entry.note}</p>` : ""}
+        ${entry.note ? `<p class="diary-note">${safeNote}</p>` : ""}
       </article>
     `;
   }).join("");
@@ -1716,7 +1735,10 @@ function setupEvents() {
     }
 
     const topicButton = target.closest("[data-topic]");
-    if (topicButton) openGuideTopic(topicButton.dataset.topic, topicButton);
+    if (topicButton) {
+      openGuideTopic(topicButton.dataset.topic, topicButton);
+      return;
+    }
 
     const guideButton = target.closest("[data-guide]");
     if (guideButton) {

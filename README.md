@@ -12,9 +12,8 @@ Appen bruger ingen backend og sender ingen data. Søvnplanen gemmes kun lokalt i
 
 Når du ændrer appen, så bump versionsnummeret i:
 
-- `index.html` query strings
-- `app.js` APP_VERSION
-- `sw.js` CACHE_VERSION og fil-query strings
+- query-strings til CSS og JavaScript i `index.html`
+- `CACHE_VERSION` og filreferencernes query-strings i `sw.js`
 
 Det får installerede PWA-versioner til at hente ny cache og vise opdateringsbanner.
 
