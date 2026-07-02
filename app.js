@@ -2077,28 +2077,66 @@ function setupInstallPrompt() {
   const button = $("#installButton");
   if (!button) return;
 
+  const isStandalone = () =>
+    window.matchMedia?.("(display-mode: standalone)")?.matches ||
+    window.navigator.standalone === true;
+
+  const isIos = () => {
+    const platform = navigator.platform || "";
+    const userAgent = navigator.userAgent || "";
+    return /iPhone|iPad|iPod/i.test(userAgent) ||
+      (platform === "MacIntel" && navigator.maxTouchPoints > 1);
+  };
+
+  const updateButtonVisibility = () => {
+    button.hidden = isStandalone() || (!deferredInstallPrompt && !isIos());
+  };
+
+  updateButtonVisibility();
+
   window.addEventListener("beforeinstallprompt", event => {
     event.preventDefault();
     deferredInstallPrompt = event;
-    button.hidden = false;
+    updateButtonVisibility();
   });
 
   button.addEventListener("click", async () => {
+    if (isIos() && !deferredInstallPrompt) {
+      closeDrawer();
+      openModal(`
+        <div class="install-guide">
+          <p class="eyebrow">Installér Nattero</p>
+          <h2 id="modalTitle">Føj appen til hjemmeskærmen</h2>
+          <ol>
+            <li>Tryk på <strong>Del</strong> i Safari.</li>
+            <li>Vælg <strong>Føj til hjemmeskærm</strong>.</li>
+            <li>Tryk på <strong>Tilføj</strong>.</li>
+          </ol>
+          <p class="muted">Installationen skal foretages fra Safari.</p>
+        </div>
+      `, button);
+      return;
+    }
+
     if (!deferredInstallPrompt) return;
+
+    const prompt = deferredInstallPrompt;
+    closeDrawer();
+
     try {
-      await deferredInstallPrompt.prompt();
-      await deferredInstallPrompt.userChoice;
+      await prompt.prompt();
+      await prompt.userChoice;
     } catch (error) {
       console.warn("Installationsdialogen kunne ikke åbnes:", error);
     } finally {
       deferredInstallPrompt = null;
-      button.hidden = true;
+      updateButtonVisibility();
     }
   });
 
   window.addEventListener("appinstalled", () => {
-    button.hidden = true;
     deferredInstallPrompt = null;
+    updateButtonVisibility();
   });
 }
 

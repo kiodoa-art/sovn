@@ -83,7 +83,7 @@ textarea:focus-visible {
   border-bottom: 1px solid rgba(220,230,240,.08);
 }
 
-.brand { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.brand { display: flex; align-items: center; gap: 12px; min-width: 0; margin-right: auto; }
 .brand-mark {
   width: 46px;
   height: 46px;
@@ -133,7 +133,6 @@ textarea:focus-visible {
 .primary-button:active,
 .secondary-button:active,
 .ghost-button:active { transform: scale(.98); }
-.install-button { white-space: nowrap; }
 .icon-button { width: 44px; padding: 0; display: grid; place-content: center; gap: 4px; }
 .icon-button span { width: 18px; height: 2px; border-radius: 999px; background: currentColor; display: block; }
 
@@ -455,11 +454,14 @@ main { padding: 10px 16px 24px; }
   padding: 16px;
   transform: translateX(-104%);
   transition: transform .24s ease;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 .drawer.open .drawer-panel { transform: translateX(0); }
 .drawer-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
 .drawer-head strong { font-size: 1.25rem; }
-.drawer-nav { display: grid; gap: 8px; }
+.drawer-nav { display: grid; gap: 8px; overflow-y: auto; min-height: 0; padding-right: 2px; flex: 1 1 auto; }
 .drawer-nav button {
   border: 1px solid var(--line);
   background: rgba(22,30,40,.65);
@@ -470,6 +472,52 @@ main { padding: 10px 16px 24px; }
   padding: 0 14px;
   font-weight: 740;
 }
+
+.drawer-install-area {
+  margin-top: auto;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+}
+.drawer-install-button {
+  width: 100%;
+  min-height: 64px;
+  border: 1px solid rgba(160,189,214,.22);
+  border-radius: 20px;
+  padding: 10px 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-align: left;
+  color: var(--text);
+  background: linear-gradient(135deg, rgba(77,119,151,.32), rgba(30,42,58,.82));
+  box-shadow: var(--shadow-soft);
+}
+.drawer-install-button[hidden] { display: none; }
+.drawer-install-button:active { transform: scale(.985); }
+.drawer-install-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 14px;
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  color: #0e1620;
+  background: var(--blue-deep);
+  font-size: 1.35rem;
+  font-weight: 900;
+}
+.drawer-install-button strong,
+.drawer-install-button small { display: block; }
+.drawer-install-button strong { margin-bottom: 3px; font-size: .98rem; }
+.drawer-install-button small { color: var(--muted); font-weight: 620; line-height: 1.25; }
+.install-guide ol {
+  margin: 16px 0;
+  padding-left: 22px;
+  display: grid;
+  gap: 12px;
+  line-height: 1.5;
+}
+
 .modal {
   display: grid;
   place-items: end center;
@@ -519,7 +567,6 @@ main { padding: 10px 16px 24px; }
 
 @media (max-width: 560px) {
   .topbar { padding-left: 12px; padding-right: 12px; }
-  .install-button { display: none; }
   main { padding: 8px 12px 20px; }
   .hero-card { padding: 20px; border-radius: 28px; }
   .hero-copy h2,

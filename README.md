@@ -25,7 +25,7 @@ Under **Settings → Pages** vælges:
 
 ## Opdatering
 
-Aktuel version: **2.3.0**
+Aktuel version: **2.3.1**
 
 Når appen ændres, skal samme versionsnummer opdateres disse steder:
 
@@ -60,3 +60,10 @@ Indtil filerne lægges ind, bruger appen de tidligere genererede lyde som midler
 - `manifest.webmanifest` – PWA-navn, farver og ikoner
 - `sw.js` – offline-cache og opdatering
 - `assets/` – ikoner, favicons og lydfiler
+
+
+## Ændringer i 2.3.1
+
+- Installer-knappen er flyttet til bunden af sidemenuen.
+- Knappen skjules automatisk, når appen allerede er installeret.
+- På iPhone og iPad vises en kort installationsvejledning til Safari.
