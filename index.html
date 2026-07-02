@@ -16,7 +16,7 @@
   <link rel="icon" href="assets/favicon-64.png" sizes="64x64" type="image/png" />
   <link rel="icon" href="assets/favicon-32.png" sizes="32x32" type="image/png" />
   <link rel="icon" href="assets/favicon-16.png" sizes="16x16" type="image/png" />
-  <link rel="stylesheet" href="styles.css?v=2.1.1" />
+  <link rel="stylesheet" href="styles.css?v=2.2.0" />
 </head>
 <body>
   <div class="app-shell">
@@ -89,33 +89,67 @@
           </div>
         </div>
 
-        <section class="home-audio-section" aria-labelledby="homeAudioTitle">
-          <div class="home-audio-head">
+        <section class="home-listen-section" aria-labelledby="homeListenTitle">
+          <div class="home-listen-head">
             <p class="eyebrow">Start her</p>
-            <h3 id="homeAudioTitle">Lydøvelser du kan bruge med det samme</h3>
-            <p>Vælg den øvelse, der passer bedst lige nu. Tryk og læg derefter telefonen fra dig.</p>
+            <h3 id="homeListenTitle">Find ro med lyd</h3>
+            <p>Fold den type lyd ud, du har brug for. Når du vælger en lyd, åbner afspilleren direkte.</p>
           </div>
-          <div class="home-audio-grid" aria-label="Fire lydøvelser">
-            <button class="home-audio-card" data-home-audio="body" type="button" aria-label="Kroppen mod madrassen">
-              <span class="home-audio-icon" aria-hidden="true">🛏️</span>
-              <strong>Kroppen mod madrassen</strong>
-              <small>Bliv roligt opmærksom på kroppens kontakt med underlaget.</small>
-            </button>
-            <button class="home-audio-card" data-home-audio="breathing" type="button" aria-label="Rolig vejrtrækning">
-              <span class="home-audio-icon" aria-hidden="true">🌬️</span>
-              <strong>Rolig vejrtrækning</strong>
-              <small>Find en enkel rytme og giv nervesystemet roligere signaler.</small>
-            </button>
-            <button class="home-audio-card" data-home-audio="sleep-fight" type="button" aria-label="Kampen mod søvnen">
-              <span class="home-audio-icon" aria-hidden="true">🌙</span>
-              <strong>Kampen mod søvnen</strong>
-              <small>Slip presset og stop med at kæmpe mod natten.</small>
-            </button>
-            <button class="home-audio-card" data-home-audio="memory" type="button" aria-label="Et roligt minde">
-              <span class="home-audio-icon" aria-hidden="true">✨</span>
-              <strong>Et roligt minde</strong>
-              <small>Hvile opmærksomheden et trygt og roligt sted.</small>
-            </button>
+
+          <div class="home-listen-accordions">
+            <details class="home-listen-disclosure">
+              <summary>
+                <span class="home-listen-summary-icon" aria-hidden="true">🎧</span>
+                <span class="home-listen-summary-copy">
+                  <strong>Baggrundslyde</strong>
+                  <small>Hvid støj, regn og skov</small>
+                </span>
+                <span class="home-listen-chevron" aria-hidden="true"></span>
+              </summary>
+              <div class="home-listen-options" aria-label="Baggrundslyde">
+                <button class="home-listen-option" data-home-sound="white" type="button">
+                  <span aria-hidden="true">〰️</span>
+                  <span><strong>Hvid støj</strong><small>Dæmper lyde omkring dig.</small></span>
+                </button>
+                <button class="home-listen-option" data-home-sound="rain" type="button">
+                  <span aria-hidden="true">🌧️</span>
+                  <span><strong>Regn</strong><small>Rolig og jævn regn.</small></span>
+                </button>
+                <button class="home-listen-option" data-home-sound="forest" type="button">
+                  <span aria-hidden="true">🌲</span>
+                  <span><strong>Skov</strong><small>Afdæmpede naturlyde.</small></span>
+                </button>
+              </div>
+            </details>
+
+            <details class="home-listen-disclosure">
+              <summary>
+                <span class="home-listen-summary-icon" aria-hidden="true">🌙</span>
+                <span class="home-listen-summary-copy">
+                  <strong>Lydøvelser</strong>
+                  <small>Fire øvelser, der bliver læst op</small>
+                </span>
+                <span class="home-listen-chevron" aria-hidden="true"></span>
+              </summary>
+              <div class="home-listen-options home-listen-options-guided" aria-label="Lydøvelser">
+                <button class="home-listen-option" data-home-audio="body" type="button">
+                  <span aria-hidden="true">🛏️</span>
+                  <span><strong>Kroppen mod madrassen</strong><small>Mærk kroppens kontakt med underlaget.</small></span>
+                </button>
+                <button class="home-listen-option" data-home-audio="breathing" type="button">
+                  <span aria-hidden="true">🌬️</span>
+                  <span><strong>Rolig vejrtrækning</strong><small>Find en rolig og enkel rytme.</small></span>
+                </button>
+                <button class="home-listen-option" data-home-audio="sleep-fight" type="button">
+                  <span aria-hidden="true">🌙</span>
+                  <span><strong>Kampen mod søvnen</strong><small>Slip presset om at skulle sove.</small></span>
+                </button>
+                <button class="home-listen-option" data-home-audio="memory" type="button">
+                  <span aria-hidden="true">✨</span>
+                  <span><strong>Et roligt minde</strong><small>Flyt fokus til noget trygt og roligt.</small></span>
+                </button>
+              </div>
+            </details>
           </div>
         </section>
 
@@ -435,6 +469,6 @@
 
   </div>
 
-  <script src="app.js?v=2.1.1" defer></script>
+  <script src="app.js?v=2.2.0" defer></script>
 </body>
 </html>

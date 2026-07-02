@@ -1545,21 +1545,28 @@ function handleBreathTechniqueClick(event) {
 
 // ─── SOUND MODAL ─────────────────────────────────────────────────────────────
 
-function openSoundModal() {
+function openSoundModal(preselectedTrackId = null) {
+  const directTrack = findBackgroundSound(preselectedTrackId);
+  const showTrackPicker = !directTrack;
+
   openModal(`
     <p class="eyebrow">Baggrundslyd</p>
-    <h2 id="modalTitle">Læg telefonen fra dig og lyt</h2>
-    <p>Vælg et lydmiljø. Start med det samme, eller giv dig selv 10 sekunder til at lægge telefonen fra dig.</p>
-    <div class="sound-grid" aria-label="Baggrundslyde">
-      ${backgroundSoundTracks.map(track => `
-        <button class="sound-btn" data-sound="${track.id}" type="button" aria-label="${track.label}">
-          <span class="sound-icon" aria-hidden="true">${track.icon}</span>
-          <strong>${track.label}</strong>
-          <small>${track.description}</small>
-        </button>
-      `).join("")}
-    </div>
-    <section class="guided-player" id="soundPlayer" aria-live="polite">
+    <h2 id="modalTitle">${directTrack ? directTrack.label : "Læg telefonen fra dig og lyt"}</h2>
+    <p>${directTrack
+      ? "Start med det samme, eller giv dig selv 10 sekunder til at lægge telefonen fra dig. Lyden fortsætter, indtil du stopper den."
+      : "Vælg et lydmiljø. Start med det samme, eller giv dig selv 10 sekunder til at lægge telefonen fra dig."}</p>
+    ${showTrackPicker ? `
+      <div class="sound-grid" aria-label="Baggrundslyde">
+        ${backgroundSoundTracks.map(track => `
+          <button class="sound-btn" data-sound="${track.id}" type="button" aria-label="${track.label}">
+            <span class="sound-icon" aria-hidden="true">${track.icon}</span>
+            <strong>${track.label}</strong>
+            <small>${track.description}</small>
+          </button>
+        `).join("")}
+      </div>
+    ` : ""}
+    <section class="guided-player ${directTrack ? "guided-player-direct" : ""}" id="soundPlayer" aria-live="polite">
       <div class="guided-countdown" id="soundCountdown" hidden>
         <div class="guided-countdown-circle" id="soundCountdownCircle">
           <div class="guided-countdown-inner">
@@ -1571,13 +1578,15 @@ function openSoundModal() {
       </div>
       <div class="guided-player-head">
         <div class="guided-player-title-wrap">
-          <span id="soundPlayerIcon" class="guided-player-icon" aria-hidden="true">🎧</span>
+          <span id="soundPlayerIcon" class="guided-player-icon" aria-hidden="true">${directTrack?.icon || "🎧"}</span>
           <div>
-            <p class="guided-player-kicker">Valgt baggrundslyd</p>
-            <h3 id="soundPlayerTitle">Vælg en baggrundslyd</h3>
+            <p class="guided-player-kicker">${directTrack ? "Baggrundslyd" : "Valgt baggrundslyd"}</p>
+            <h3 id="soundPlayerTitle">${directTrack?.label || "Vælg en baggrundslyd"}</h3>
           </div>
         </div>
-        <p id="soundPlayerMeta" class="guided-audio-meta">Vælg hvid støj, regn eller skov.</p>
+        <p id="soundPlayerMeta" class="guided-audio-meta">${directTrack
+          ? `${directTrack.description} Lyden gentages automatisk.`
+          : "Vælg hvid støj, regn eller skov."}</p>
       </div>
       <div class="guided-progress-track"><div class="guided-progress-fill" id="soundProgress"></div></div>
       <div class="guided-time-row">
@@ -1593,20 +1602,24 @@ function openSoundModal() {
         <button class="secondary-button" id="soundRestartBtn" type="button" disabled>Start forfra</button>
         <button class="ghost-button" id="soundStopBtn" type="button" disabled>Stop</button>
       </div>
-      <p id="soundStatus" class="guided-player-status">Ingen lyd valgt endnu.</p>
+      <p id="soundStatus" class="guided-player-status">${directTrack ? "Klar til afspilning." : "Ingen lyd valgt endnu."}</p>
     </section>
   `);
 
-  $$("[data-sound]").forEach(button => {
-    button.addEventListener("click", () => selectSoundTrack(button.dataset.sound));
+  $$('[data-sound]').forEach(button => {
+    button.addEventListener('click', () => selectSoundTrack(button.dataset.sound));
   });
-  $("#soundStartNowBtn")?.addEventListener("click", () => startSound("now"));
-  $("#soundStartDelayedBtn")?.addEventListener("click", () => startSound("delay"));
-  $("#soundPlayPauseBtn")?.addEventListener("click", toggleSoundPlayback);
-  $("#soundRestartBtn")?.addEventListener("click", restartSound);
-  $("#soundStopBtn")?.addEventListener("click", stopSoundPlayback);
+  $('#soundStartNowBtn')?.addEventListener('click', () => startSound('now'));
+  $('#soundStartDelayedBtn')?.addEventListener('click', () => startSound('delay'));
+  $('#soundPlayPauseBtn')?.addEventListener('click', toggleSoundPlayback);
+  $('#soundRestartBtn')?.addEventListener('click', restartSound);
+  $('#soundStopBtn')?.addEventListener('click', stopSoundPlayback);
 
-  syncSoundUI();
+  if (directTrack) {
+    selectSoundTrack(directTrack.id);
+  } else {
+    syncSoundUI();
+  }
 }
 
 // ─── GUIDED AUDIO ────────────────────────────────────────────────────────────
@@ -2115,6 +2128,12 @@ function setupEvents() {
     const target = event.target instanceof Element ? event.target : null;
     if (!target) return;
 
+    const homeSoundButton = target.closest("[data-home-sound]");
+    if (homeSoundButton) {
+      openSoundModal(homeSoundButton.dataset.homeSound);
+      return;
+    }
+
     const homeAudioButton = target.closest("[data-home-audio]");
     if (homeAudioButton) {
       openGuidedAudioModal(homeAudioButton.dataset.homeAudio);
@@ -2159,8 +2178,8 @@ function setupEvents() {
   $("#clearPlan")?.addEventListener("click", clearPlan);
   $("#printPlan")?.addEventListener("click", () => window.print());
   $("#breathingButton")?.addEventListener("click", openBreathing);
-  $("#soundButton")?.addEventListener("click", openSoundModal);
-  $("#guidedAudioButton")?.addEventListener("click", openGuidedAudioModal);
+  $("#soundButton")?.addEventListener("click", () => openSoundModal());
+  $("#guidedAudioButton")?.addEventListener("click", () => openGuidedAudioModal());
   $("#thoughtButton")?.addEventListener("click", openThoughtParking);
   $("#sleepCalcButton")?.addEventListener("click", openSleepCalc);
   $("#acuteSymptomBtn")?.addEventListener("click", () => {
@@ -2189,6 +2208,19 @@ function setupEvents() {
   });
 }
 
+
+function setupHomeListenAccordions() {
+  const accordions = $$(".home-listen-disclosure");
+  accordions.forEach(accordion => {
+    accordion.addEventListener("toggle", () => {
+      if (!accordion.open) return;
+      accordions.forEach(other => {
+        if (other !== accordion) other.open = false;
+      });
+    });
+  });
+}
+
 // ─── INIT ─────────────────────────────────────────────────────────────────────
 
 function init() {
@@ -2199,6 +2231,7 @@ function init() {
   setupDiary();
   setupReminder();
   setupEvents();
+  setupHomeListenAccordions();
   setupInstallPrompt();
   setupServiceWorker();
   const hashRoute = location.hash.replace("#", "");

@@ -547,8 +547,8 @@ main { padding: 10px 16px 24px; }
 }
 
 
-/* Forside – lydøvelser */
-.home-audio-section {
+/* Forside – kompakte lydvalg */
+.home-listen-section {
   margin: 18px 0 6px;
   padding: 18px;
   border: 1px solid var(--line);
@@ -557,60 +557,122 @@ main { padding: 10px 16px 24px; }
   box-shadow: var(--shadow-soft);
   backdrop-filter: blur(18px);
 }
-.home-audio-head h3 {
+.home-listen-head h3 {
   margin: 0 0 8px;
   font-size: 1.35rem;
   letter-spacing: -.035em;
 }
-.home-audio-head p:last-child {
+.home-listen-head p:last-child {
   margin: 0;
   color: var(--muted);
   line-height: 1.45;
 }
-.home-audio-grid {
+.home-listen-accordions {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 10px;
   margin-top: 16px;
 }
-.home-audio-card {
-  min-height: 152px;
+.home-listen-disclosure {
+  overflow: hidden;
   border: 1px solid var(--line);
-  border-radius: 22px;
+  border-radius: 20px;
   background: rgba(22,30,40,.66);
+  box-shadow: var(--shadow-soft);
+}
+.home-listen-disclosure summary {
+  min-height: 76px;
+  padding: 12px 14px;
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr) 20px;
+  align-items: center;
+  gap: 12px;
   color: var(--text);
-  padding: 16px;
+  cursor: pointer;
+  list-style: none;
+  transition: background .16s ease;
+}
+.home-listen-disclosure summary::-webkit-details-marker { display: none; }
+.home-listen-disclosure summary:hover { background: rgba(100,140,175,.10); }
+.home-listen-disclosure[open] summary {
+  background: rgba(100,140,175,.12);
+  border-bottom: 1px solid var(--line);
+}
+.home-listen-summary-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 15px;
+  display: grid;
+  place-items: center;
+  background: rgba(100,140,175,.14);
+  font-size: 1.4rem;
+}
+.home-listen-summary-copy strong,
+.home-listen-summary-copy small { display: block; }
+.home-listen-summary-copy strong {
+  margin-bottom: 3px;
+  font-size: 1rem;
+}
+.home-listen-summary-copy small {
+  color: var(--muted);
+  line-height: 1.35;
+}
+.home-listen-chevron {
+  width: 10px;
+  height: 10px;
+  border-right: 2px solid var(--muted);
+  border-bottom: 2px solid var(--muted);
+  transform: rotate(45deg) translate(-2px, -2px);
+  transition: transform .18s ease;
+}
+.home-listen-disclosure[open] .home-listen-chevron {
+  transform: rotate(225deg) translate(-1px, -1px);
+}
+.home-listen-options {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 9px;
+  padding: 12px;
+}
+.home-listen-options-guided { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.home-listen-option {
+  min-height: 78px;
+  padding: 11px 12px;
+  border: 1px solid var(--line);
+  border-radius: 17px;
+  background: rgba(17,23,32,.62);
+  color: var(--text);
   text-align: left;
   display: grid;
-  align-content: start;
+  grid-template-columns: 38px minmax(0, 1fr);
+  align-items: center;
   gap: 10px;
-  box-shadow: var(--shadow-soft);
   transition: transform .16s ease, border-color .16s ease, background .16s ease;
 }
-.home-audio-card:hover {
+.home-listen-option:hover {
   transform: translateY(-1px);
   border-color: var(--blue-deep);
   background: rgba(100,140,175,.14);
 }
-.home-audio-icon {
-  width: 50px;
-  height: 50px;
-  border-radius: 16px;
+.home-listen-option > span:first-child {
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
   display: grid;
   place-items: center;
-  background: rgba(100,140,175,.14);
-  font-size: 1.55rem;
+  background: rgba(100,140,175,.12);
+  font-size: 1.15rem;
 }
-.home-audio-card strong {
-  display: block;
-  font-size: 1rem;
+.home-listen-option strong,
+.home-listen-option small { display: block; }
+.home-listen-option strong {
+  margin-bottom: 3px;
+  font-size: .91rem;
   line-height: 1.25;
 }
-.home-audio-card small {
-  display: block;
+.home-listen-option small {
   color: var(--muted);
-  line-height: 1.42;
-  font-size: .84rem;
+  font-size: .76rem;
+  line-height: 1.3;
 }
 
 /* Guide-tags */
@@ -952,7 +1014,9 @@ main { padding: 10px 16px 24px; }
 
 @media (max-width: 560px) {
   .guided-audio-grid { grid-template-columns: 1fr; }
-  .home-audio-grid { grid-template-columns: 1fr; }
+  .home-listen-options,
+  .home-listen-options-guided { grid-template-columns: 1fr; }
+  .home-listen-option { min-height: 72px; }
 }
 
 /* ─── SLEEP CALC MODAL ───────────────────────────────────────────────────── */
@@ -1021,7 +1085,7 @@ main { padding: 10px 16px 24px; }
 @media (max-width: 720px) {
   .hero-card { grid-template-columns: 1fr; }
   .hero-illustration { display: none; }
-  .home-audio-section { margin-top: 12px; }
+  .home-listen-section { margin-top: 12px; }
   .bottom-nav { left: 10px; right: 10px; }
 }
 

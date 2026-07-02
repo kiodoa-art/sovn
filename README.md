@@ -25,7 +25,7 @@ Under **Settings → Pages** vælges:
 
 ## Opdatering
 
-Aktuel version: **2.1.1**
+Aktuel version: **2.2.0**
 
 Når appen ændres, skal samme versionsnummer opdateres disse steder:
 
@@ -33,6 +33,10 @@ Når appen ændres, skal samme versionsnummer opdateres disse steder:
 - `CACHE_VERSION` og filreferencernes query-strings i `sw.js`
 
 Det sikrer, at installerede PWA-versioner henter den nye cache. Service workeren aktiveres automatisk, hvorefter appen genindlæses.
+
+## Forsidens lydvalg
+
+Forsiden har to kompakte fold-ud-felter: **Baggrundslyde** og **Lydøvelser**. Kun ét felt kan være åbent ad gangen. Et tryk på en konkret lyd åbner direkte i den eksisterende afspiller-popup.
 
 ## Baggrundslyde
 

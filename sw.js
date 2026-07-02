@@ -1,9 +1,9 @@
-const CACHE_VERSION = "nattero-v2.1.1";
+const CACHE_VERSION = "nattero-v2.2.0";
 const APP_SHELL = [
   "./",
   "./index.html",
-  "./styles.css?v=2.1.1",
-  "./app.js?v=2.1.1",
+  "./styles.css?v=2.2.0",
+  "./app.js?v=2.2.0",
   "./manifest.webmanifest",
   "./assets/favicon.svg",
   "./assets/favicon-16.png",
