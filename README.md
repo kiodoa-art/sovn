@@ -2,7 +2,7 @@
 
 **Hjælp til bedre søvn**
 
-Nattero er en lille statisk PWA på dansk med rolige lydøvelser, konkrete søvnråd, søvnplan, påmindelse og søvndagbog.
+Nattero er en lille statisk PWA på dansk med rolige lydøvelser, letforståelige søvnråd, søvnplan, påmindelse og søvndagbog.
 
 ## Teknologi
 
@@ -25,7 +25,7 @@ Under **Settings → Pages** vælges:
 
 ## Opdatering
 
-Aktuel version: **2.2.0**
+Aktuel version: **2.3.0**
 
 Når appen ændres, skal samme versionsnummer opdateres disse steder:
 
@@ -33,6 +33,10 @@ Når appen ændres, skal samme versionsnummer opdateres disse steder:
 - `CACHE_VERSION` og filreferencernes query-strings i `sw.js`
 
 Det sikrer, at installerede PWA-versioner henter den nye cache. Service workeren aktiveres automatisk, hvorefter appen genindlæses.
+
+## Sprog og målgruppe
+
+Teksterne er skrevet i et enkelt, voksent hverdagssprog til brugere fra cirka 20 til 60 år. Fagudtryk er så vidt muligt erstattet eller forklaret direkte.
 
 ## Forsidens lydvalg
 

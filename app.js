@@ -19,45 +19,45 @@ let reminderTimeoutId = null;
 const steps = [
   {
     "kicker": "Start her",
-    "title": "Stop kampen",
-    "text": "Når du begynder at presse dig selv til at sove, bliver kroppen ofte mere vågen. Sig stille til dig selv: Jeg behøver ikke løse hele natten. Jeg tager kun næste skridt.",
+    "title": "Slip presset om at skulle sove",
+    "text": "Når du presser dig selv til at sove, bliver kroppen ofte mere vågen. Sig stille til dig selv: Jeg behøver ikke løse hele natten. Jeg tager kun næste skridt.",
     "tip": "Tip: Lad være med at tjekke klokken igen og igen. Det gør ofte natten mere anspændt."
   },
   {
     "kicker": "Kroppen først",
     "title": "Læg mærke til underlaget",
-    "text": "Mærk hvor kroppen har kontakt med madrassen. Hoved, skuldre, ryg, ben og fødder. Du skal ikke slappe perfekt af. Du skal bare registrere kroppen roligt.",
+    "text": "Mærk, hvor kroppen rører madrassen: hoved, skuldre, ryg, ben og fødder. Du skal ikke slappe perfekt af. Læg bare roligt mærke til kroppen.",
     "tip": "Prøv: Her er hovedet. Her er skuldrene. Her er madrassen. Gentag langsomt."
   },
   {
     "kicker": "Vejrtrækning",
     "title": "Gør udåndingen lidt længere",
-    "text": "Træk vejret naturligt ind. Pust langsomt ud, en smule længere end indåndingen. Lang udånding kan fortælle nervesystemet, at der ikke er akut fare.",
-    "tip": "Ingen præstation. Hvis det bliver anstrengende, så vend tilbage til almindelig vejrtrækning."
+    "text": "Træk vejret naturligt ind. Pust langsomt ud, en smule længere end indåndingen. Den lidt længere udånding kan hjælpe kroppen med at falde til ro.",
+    "tip": "Du skal ikke gøre det perfekt. Hvis det bliver anstrengende, så vend tilbage til din almindelige vejrtrækning."
   },
   {
     "kicker": "Tankemylder",
-    "title": "Parkér tankerne",
-    "text": "Hvis hovedet planlægger, bekymrer sig eller gennemgår dagen, så giv tankerne en parkeringsplads. Skriv få stikord ned, eller sig: Det her skal ikke løses i nat. Det tager jeg i morgen.",
-    "tip": "Du skal ikke arbejde videre med tankerne. Du skal bare have dem ud af hovedet."
+    "title": "Skriv tankerne ned",
+    "text": "Hvis du planlægger, bekymrer dig eller gennemgår dagen, så skriv nogle få stikord ned. Sig til dig selv: Det her skal ikke løses i nat. Jeg tager det i morgen.",
+    "tip": "Du skal ikke løse tankerne nu. Du skal bare skrive dem ned, så du kan vende tilbage til dem i morgen."
   },
   {
-    "kicker": "Stimuluskontrol",
-    "title": "Styrk koblingen mellem seng og søvn",
-    "text": "Hvis du bliver mere vågen, irriteret eller anspændt, så stå roligt op. Hold lyset dæmpet og lav noget stille, kedeligt og trygt. Gå tilbage i seng, når søvnigheden kommer igen.",
-    "tip": "Pointen er ikke at give op. Pointen er at undgå, at sengen bliver et sted, hvor du kæmper."
+    "kicker": "Hvis du bliver liggende vågen",
+    "title": "Stå roligt op, hvis du bliver mere vågen",
+    "text": "Hvis du bliver mere vågen, irriteret eller anspændt, så stå roligt op. Hold lyset dæmpet, og lav noget stille og enkelt. Gå tilbage i seng, når du bliver søvnig igen.",
+    "tip": "Det hjælper med at holde sengen forbundet med søvn og ro i stedet for vågenhed og frustration."
   },
   {
-    "kicker": "Kedeligt er godt",
-    "title": "Lav noget dæmpet",
-    "text": "Læs noget uinteressant, fold tøj, lyt til rolig lyd eller sid stille. Undgå skærm, nyheder, arbejde og alt der får dig op i gear.",
+    "kicker": "Noget roligt og enkelt",
+    "title": "Lav noget roligt",
+    "text": "Læs noget roligt, fold tøj, lyt til en stille lyd eller sid lidt uden at lave noget. Undgå nyheder, arbejde og andet, der gør dig mere vågen.",
     "tip": "Gå tilbage i seng, når kroppen igen føles søvnig — ikke bare fordi klokken siger det."
   },
   {
     "kicker": "I morgen",
     "title": "Hold fast i morgenen",
-    "text": "Efter en dårlig nat er det fristende at sove længe. Men et nogenlunde fast stå-op-tidspunkt hjælper kroppen med at finde rytmen igen.",
-    "tip": "Ved flere dårlige nætter i træk: brug din søvnplan og kontakt læge eller behandler ved bekymring."
+    "text": "Efter en dårlig nat er det fristende at sove længe. Men et nogenlunde fast tidspunkt at stå op hjælper kroppen med at finde rytmen igen.",
+    "tip": "Hvis søvnproblemerne fortsætter eller påvirker din hverdag, så tal med din læge eller behandler."
   }
 ];
 
@@ -66,11 +66,11 @@ const steps = [
 const guideTopics = [
   {
     id: "sleep-now",
-    category: "Akut",
+    category: "Lige nu",
     icon: "⚡",
     title: "Jeg ligger vågen",
-    teaser: "Når natten er i gang, og du ikke kan sove.",
-    actionLabel: "Åbn akut-guide",
+    teaser: "Korte råd, når du ligger vågen og ikke kan finde ro.",
+    actionLabel: "Åbn guiden",
     route: "now"
   },
   {
@@ -78,21 +78,21 @@ const guideTopics = [
     category: "Dag",
     icon: "☀️",
     title: "Gode søvnvaner",
-    teaser: "Koffein, lys, motion, lure og ting der påvirker natten."
+    teaser: "Lys, bevægelse, lure, koffein og andre ting, der påvirker søvnen."
   },
   {
     id: "evening-routine",
     category: "Aften",
     icon: "🌙",
     title: "Aften og soveværelse",
-    teaser: "Neddrosling, skærme, tanker, temperatur og ro."
+    teaser: "Sådan gør du aftenen og soveværelset mere rolige."
   },
   {
     id: "learn-sleep",
-    category: "Info",
+    category: "Viden",
     icon: "📚",
     title: "Lær om søvn",
-    teaser: "Søvnbehov, søvnkontrol, medicin og hvorfor kamp gør det værre."
+    teaser: "Søvnbehov, medicin, målinger og pres omkring søvn."
   }
 ];
 
@@ -106,104 +106,104 @@ const guidesData = [
   {
     "id": "morning-fixed",
     "category": "Morgen",
-    "title": "Hold fast i stå-op-tiden",
-    "text": "En fast morgen er ofte vigtigere end en perfekt sengetid. Dårlige nætter rettes bedst med en stabil start på dagen."
+    "title": "Hold fast i tidspunktet, du står op",
+    "text": "Et nogenlunde fast tidspunkt at stå op er ofte vigtigere end en helt præcis sengetid. En stabil start på dagen hjælper kroppen med at finde en rytme."
   },
   {
     "id": "day-movement",
     "category": "Dag",
     "title": "Brug kroppen i dagtimerne",
-    "text": "Gåtur, let motion eller anden bevægelse i løbet af dagen kan øge søvnpresset. Undgå hård træning lige før sengetid."
+    "text": "En gåtur, let motion eller anden bevægelse i løbet af dagen kan gøre det lettere at blive søvnig om aftenen. Undgå hård træning lige før sengetid, hvis det holder dig vågen."
   },
   {
     "id": "day-naps",
     "category": "Dag",
     "title": "Pas på lange lure",
-    "text": "En kort lur kan være okay, men lange eller sene lure stjæler ofte søvnpresset fra natten. Hold den kort og tidligt på dagen."
+    "text": "En kort lur kan være okay, men lange eller sene lure kan gøre det sværere at blive søvnig om aftenen. Hold den kort og tidligt på dagen."
   },
   {
     "id": "caffeine",
     "category": "Dag",
-    "title": "Koffein skal stoppe tidligt",
-    "text": "Kaffe, cola, energidrik og stærk te kan blive hængende længe i kroppen. Prøv at stoppe senest midt på eftermiddagen — og tidligere, hvis du er følsom."
+    "title": "Stop koffein i god tid",
+    "text": "Kaffe, cola, energidrik og stærk te kan virke i kroppen i mange timer. Prøv at stoppe senest midt på eftermiddagen — og tidligere, hvis du mærker koffein tydeligt."
   },
   {
     "id": "evening-winddown",
     "category": "Aften",
-    "title": "Gør aftenen kedelig på den gode måde",
+    "title": "Gør aftenen roligere trin for trin",
     "text": "Luk dagens vigtige opgaver ned først, og lad aftenen blive roligere trin for trin. Mindre lys, færre krav og lavere tempo gør overgangen til søvn lettere."
   },
   {
     "id": "screens-light",
     "category": "Aften",
     "title": "Dæmp lys og skærme",
-    "text": "Den sidste time før sengetid bør være lav på lys og høj på ro. Hvis du bruger skærm, så dæmp lysstyrken og vælg noget udramatisk."
+    "text": "Prøv at gøre den sidste time før sengetid roligere og med mindre lys. Hvis du bruger en skærm, så dæmp lysstyrken og vælg noget, der ikke gør dig mere vågen."
   },
   {
     "id": "bedroom",
     "category": "Aften",
     "title": "Gør soveværelset søvnvenligt",
-    "text": "Mørkt, roligt og køligt er det sikre valg. Luft ud, skru ned for varme, brug eventuelt ørepropper og fjern ting der minder om arbejde."
+    "text": "Et mørkt, roligt og køligt soveværelse hjælper de fleste. Luft ud, skru ned for varmen, brug eventuelt ørepropper, og fjern ting, der minder om arbejde."
   },
   {
     "id": "food-alcohol",
     "category": "Aften",
-    "title": "Undgå at kroppen arbejder på overtid",
+    "title": "Spis let og begræns alkohol sent",
     "text": "Gå hverken sulten eller overmæt i seng. Alkohol kan gøre dig døsig, men søvnen bliver ofte mere urolig og afbrudt."
   },
   {
     "id": "thought-parking",
-    "category": "Akut",
-    "title": "Tøm hovedet uden at løse alt",
+    "category": "Lige nu",
+    "title": "Skriv tankerne ned til i morgen",
     "text": "Skriv de tanker ned, der kører rundt. Ikke lange forklaringer. Bare stikord. Når tanken dukker op igen, kan du minde dig selv om, at den er gemt til i morgen."
   },
   {
     "id": "night",
-    "category": "Akut",
+    "category": "Lige nu",
     "title": "Jeg vågner om natten",
-    "text": "Tjek ikke klokken igen og igen. Hvis du bliver mere vågen, så stå roligt op, hold lyset dæmpet og lav noget kedeligt, indtil søvnigheden vender tilbage."
+    "text": "Tjek ikke klokken igen og igen. Hvis du bliver mere vågen, så stå roligt op, hold lyset dæmpet og lav noget roligt og enkelt, indtil du bliver søvnig igen."
   },
   {
     "id": "fall-asleep",
-    "category": "Akut",
+    "category": "Lige nu",
     "title": "Jeg kan ikke falde i søvn",
-    "text": "Lad være med at presse søvnen frem. Hvis sengen bliver en kampplads, så brug stimuluskontrol: op, dæmpet lys, kedelig aktivitet og tilbage først ved søvnighed."
+    "text": "Lad være med at presse søvnen frem. Bliver du mere vågen eller anspændt i sengen, så stå roligt op, dæmp lyset, lav noget enkelt, og gå tilbage, når du bliver søvnig."
   },
   {
     "id": "visual-memory",
-    "category": "Akut",
+    "category": "Lige nu",
     "title": "Gå langsomt gennem et trygt minde",
     "text": "Vælg en god ferie eller en rolig periode. Gennemgå den i detaljer: hvad du pakkede, hvor du gik hen, hvem der var der. Når tankerne hopper, vender du stille tilbage."
   },
   {
     "id": "countdown",
-    "category": "Akut",
+    "category": "Lige nu",
     "title": "Tavleøvelsen",
     "text": "Forestil dig en tavle. Skriv 100, visk det ud, skriv 99, og fortsæt langsomt nedad. Det er ikke vigtigt at nå langt. Det vigtige er at vende tilbage, når tankerne flyver."
   },
   {
     "id": "sleep-thoughts",
-    "category": "Info",
-    "title": "Søvn bliver dårligere af kamp",
-    "text": "Negative tanker om søvn holder kroppen vågen. Prøv i stedet: Det er okay, at jeg hviler. Jeg behøver ikke vinde over natten lige nu."
+    "category": "Viden",
+    "title": "Pres kan gøre det sværere at sove",
+    "text": "Bekymringer om søvnen kan holde kroppen vågen. Prøv i stedet: Det er okay, at jeg hviler. Jeg behøver ikke løse hele natten lige nu."
   },
   {
     "id": "sleep-need",
-    "category": "Info",
+    "category": "Viden",
     "title": "Søvnbehov er forskelligt",
-    "text": "Mange voksne ligger omkring 7-8 timer, men der er normal variation. Kig efter funktion og mønstre over tid — ikke én enkelt dårlig nat."
+    "text": "Mange voksne har brug for omkring 7-9 timers søvn, men behovet varierer. Se på, hvordan du fungerer, og på mønstre over tid — ikke kun på én dårlig nat."
   },
   {
     "id": "meds",
-    "category": "Info",
+    "category": "Viden",
     "title": "Medicin og søvn",
     "text": "Noget medicin kan virke opkvikkende, andet kan sløve. Ændr ikke medicin selv. Tal med læge eller behandler, hvis søvnen ændrer sig tydeligt."
   },
   {
     "id": "tracker-clock",
-    "category": "Info",
-    "title": "Pas på søvnkontrol",
-    "text": "Søvntracker og klokketjek kan gøre dig mere optaget af søvnen. Hvis det stresser dig, så læg målingerne væk i en periode."
+    "category": "Viden",
+    "title": "Målinger kan fylde for meget",
+    "text": "Et søvnur, en app eller gentagne kig på klokken kan gøre dig mere optaget af søvnen. Hvis målingerne stresser dig, så læg dem væk i en periode."
   }
 ];
 
@@ -217,17 +217,17 @@ const breathingTechniques = {
       { name: "Hold", duration: 7 },
       { name: "Pust ud", duration: 8 }
     ],
-    description: "Klassisk afslapningsteknik. Trækker vejret ind i 4 sek., holder i 7, puster ud i 8. Beroligende for nervesystemet."
+    description: "Træk vejret ind i 4 sekunder, hold i 7, og pust ud i 8. Vælg en anden øvelse, hvis det føles ubehageligt."
   },
   "box": {
-    label: "Box breathing",
+    label: "4-4-4-4",
     phases: [
       { name: "Træk ind", duration: 4 },
       { name: "Hold", duration: 4 },
       { name: "Pust ud", duration: 4 },
       { name: "Hold", duration: 4 }
     ],
-    description: "Brugt af bl.a. soldater og atleter til at falde til ro hurtigt. Fire lige lange faser."
+    description: "Fire lige lange faser: ind, hold, ud og hold. Du bestemmer selv, hvor mange runder du tager."
   },
   "simple": {
     label: "Simpel rytme",
@@ -235,7 +235,7 @@ const breathingTechniques = {
       { name: "Ind", duration: 4 },
       { name: "Ud", duration: 6 }
     ],
-    description: "Enkel og blid. Lidt længere udånding end indånding — det er nok til at skrue ned for alarmberedskabet."
+    description: "Træk vejret roligt ind i 4 sekunder og ud i 6. Den lidt længere udånding kan hjælpe kroppen med at falde til ro."
   }
 };
 
@@ -279,7 +279,7 @@ const backgroundSoundTracks = [
     id: "white",
     icon: "〰️",
     label: "Hvid støj",
-    description: "En jævn lyd, der kan dæmpe forstyrrende lyde omkring dig.",
+    description: "En jævn lyd, der kan dæmpe andre lyde omkring dig.",
     file: "assets/audio/hvid-stoej.mp3"
   },
   {
@@ -293,7 +293,7 @@ const backgroundSoundTracks = [
     id: "forest",
     icon: "🌲",
     label: "Skov",
-    description: "Et roligt skovmiljø med vind, blade og afdæmpede naturlyde.",
+    description: "Rolige lyde fra vind, blade og natur.",
     file: "assets/audio/skov.mp3"
   }
 ];
@@ -565,7 +565,7 @@ async function beginSoundPlayback(restart = true) {
 
     try {
       await startGeneratedSound(track.id);
-      soundNotice = "MP3-filen er ikke lagt ind endnu. Der afspilles en midlertidig lyd.";
+      soundNotice = "Den valgte MP3-fil mangler endnu. Appen afspiller en midlertidig lyd.";
     } catch (fallbackError) {
       console.warn(`${APP_NAME} kunne ikke starte baggrundslyd:`, fallbackError);
       soundNotice = "Lyden kunne ikke startes. Tjek telefonens lydindstillinger og prøv igen.";
@@ -768,7 +768,7 @@ function syncSoundUI() {
       : soundFallbackElapsed;
     if (progress) progress.style.width = "0%";
     if (current) current.textContent = formatMediaTime(elapsed);
-    if (total) total.textContent = "Løkke";
+    if (total) total.textContent = "Gentages";
   } else {
     if (progress) progress.style.width = "0%";
     if (current) current.textContent = "0:00";
@@ -778,7 +778,7 @@ function syncSoundUI() {
   if (status) {
     if (soundNotice) status.textContent = soundNotice;
     else if (countdownActive) status.textContent = "Du kan lægge telefonen fra dig nu. Lyden starter om et øjeblik.";
-    else if (isPlaying) status.textContent = `${track.label} spiller i en rolig løkke…`;
+    else if (isPlaying) status.textContent = `${track.label} afspilles og gentages automatisk…`;
     else if (filePaused || soundFallbackPaused) status.textContent = "Lyden er sat på pause.";
     else status.textContent = "Klar. Vælg Start nu eller Start om 10 sekunder.";
   }
@@ -902,7 +902,7 @@ function renderStep() {
 // ─── GUIDES ───────────────────────────────────────────────────────────────────
 
 function getGuideTagClass(category) {
-  return { "Morgen": "tag-morning", "Dag": "tag-day", "Aften": "tag-evening", "Akut": "tag-acute", "Info": "tag-info" }[category] || "tag-info";
+  return { "Morgen": "tag-morning", "Dag": "tag-day", "Aften": "tag-evening", "Lige nu": "tag-acute", "Viden": "tag-info" }[category] || "tag-info";
 }
 
 function getTopicItems(topicId) {
@@ -1047,7 +1047,7 @@ function clearPlan() {
   localStorage.removeItem(PLAN_KEY);
   $("#sleepPlan")?.reset();
   const status = $("#saveStatus");
-  if (status) status.textContent = "Planen er ryddet.";
+  if (status) status.textContent = "Planen er slettet.";
 }
 
 // ─── REMINDER ─────────────────────────────────────────────────────────────────
@@ -1087,7 +1087,7 @@ function setupReminder() {
       reminderTimeoutId = null;
       try {
         new Notification(`${APP_NAME} – Sengetid 🌙`, {
-          body: "Det er snart tid til at finde ro og gøre klar til at sove.",
+          body: "Det er tid til at gøre aftenen roligere og forberede dig på at sove.",
           icon: "assets/icon-192.png"
         });
       } catch (error) {
@@ -1096,7 +1096,7 @@ function setupReminder() {
     }, msUntil);
 
     const hhmm = target.toLocaleTimeString("da-DK", { hour: "2-digit", minute: "2-digit" });
-    status.textContent = `✓ Påmindelse sat til kl. ${hhmm}. Husk: Den virker kun, mens appen eller fanen forbliver åben i baggrunden.`;
+    status.textContent = `✓ Påmindelsen er sat til kl. ${hhmm}. Den virker kun, hvis appen stadig er åben.`;
   });
 }
 
@@ -1264,7 +1264,7 @@ function setupDiary() {
       await saveDiaryEntry({ date, bedTime, wakeTime, quality: selectedQuality, note });
 
       if (status) {
-        status.textContent = "Natten er gemt ✓";
+        status.textContent = "Oplysningerne er gemt ✓";
         setTimeout(() => { if (status.isConnected) status.textContent = ""; }, 2500);
       }
 
@@ -1289,15 +1289,15 @@ function setupDiary() {
   });
 
   $("#clearDiary")?.addEventListener("click", async () => {
-    if (!confirm("Slet alle dagbogsnotater?")) return;
+    if (!confirm("Vil du slette alle nætter i søvndagbogen?")) return;
     const status = $("#diaryStatus");
     try {
       await clearDiaryEntries();
       await renderDiary();
-      if (status) status.textContent = "Dagbogen er ryddet.";
+      if (status) status.textContent = "Alle nætter er slettet.";
     } catch (error) {
       console.error("Søvndagbogen kunne ikke ryddes:", error);
-      if (status) status.textContent = "Dagbogen kunne ikke ryddes.";
+      if (status) status.textContent = "Nætterne kunne ikke slettes.";
     }
   });
 }
@@ -1318,7 +1318,7 @@ function renderDiaryChart(entries) {
   const chart = $("#diaryChart");
   if (!chart) return;
   if (!entries.length) {
-    chart.innerHTML = `<p class="diary-empty">Ingen nætter logget endnu.</p>`;
+    chart.innerHTML = `<p class="diary-empty">Du har ikke gemt nogen nætter endnu.</p>`;
     return;
   }
 
@@ -1392,7 +1392,7 @@ function renderDiaryList(entries) {
         <div class="diary-entry-head">
           <strong>${dateStr}</strong>
           <span class="diary-meta">
-            ${entry.bedTime ? `Lagde mig ${safeBedTime}` : ""}
+            ${entry.bedTime ? `Gik i seng ${safeBedTime}` : ""}
             ${entry.bedTime && entry.wakeTime ? " · " : ""}
             ${entry.wakeTime ? `Stod op ${safeWakeTime}` : ""}
             ${hours ? ` · ${hours} timer` : ""}
@@ -1497,7 +1497,7 @@ function runBreathPhase() {
 function openBreathing() {
   openModal(`
     <p class="eyebrow">Vejrtrækning</p>
-    <h2 id="modalTitle">Vælg teknik</h2>
+    <h2 id="modalTitle">Vælg en vejrtrækningsøvelse</h2>
     <div class="breath-technique-grid">
       ${Object.entries(breathingTechniques).map(([key, t]) => `
         <button class="breath-technique-btn" data-technique="${key}" type="button">
@@ -1553,8 +1553,8 @@ function openSoundModal(preselectedTrackId = null) {
     <p class="eyebrow">Baggrundslyd</p>
     <h2 id="modalTitle">${directTrack ? directTrack.label : "Læg telefonen fra dig og lyt"}</h2>
     <p>${directTrack
-      ? "Start med det samme, eller giv dig selv 10 sekunder til at lægge telefonen fra dig. Lyden fortsætter, indtil du stopper den."
-      : "Vælg et lydmiljø. Start med det samme, eller giv dig selv 10 sekunder til at lægge telefonen fra dig."}</p>
+      ? "Start med det samme, eller vælg 10 sekunder, så du kan lægge telefonen fra dig. Lyden fortsætter, indtil du stopper den."
+      : "Vælg en baggrundslyd. Start med det samme, eller vælg 10 sekunder, så du kan lægge telefonen fra dig."}</p>
     ${showTrackPicker ? `
       <div class="sound-grid" aria-label="Baggrundslyde">
         ${backgroundSoundTracks.map(track => `
@@ -1580,7 +1580,7 @@ function openSoundModal(preselectedTrackId = null) {
         <div class="guided-player-title-wrap">
           <span id="soundPlayerIcon" class="guided-player-icon" aria-hidden="true">${directTrack?.icon || "🎧"}</span>
           <div>
-            <p class="guided-player-kicker">${directTrack ? "Baggrundslyd" : "Valgt baggrundslyd"}</p>
+            <p class="guided-player-kicker">Baggrundslyd</p>
             <h3 id="soundPlayerTitle">${directTrack?.label || "Vælg en baggrundslyd"}</h3>
           </div>
         </div>
@@ -1602,7 +1602,7 @@ function openSoundModal(preselectedTrackId = null) {
         <button class="secondary-button" id="soundRestartBtn" type="button" disabled>Start forfra</button>
         <button class="ghost-button" id="soundStopBtn" type="button" disabled>Stop</button>
       </div>
-      <p id="soundStatus" class="guided-player-status">${directTrack ? "Klar til afspilning." : "Ingen lyd valgt endnu."}</p>
+      <p id="soundStatus" class="guided-player-status">${directTrack ? "Klar til at starte." : "Ingen lyd valgt endnu."}</p>
     </section>
   `);
 
@@ -1914,8 +1914,8 @@ function openGuidedAudioModal(preselectedTrackId = null) {
     <p class="eyebrow">Lydøvelse</p>
     <h2 id="modalTitle">${directTrack ? directTrack.label : "Læg telefonen fra dig og lyt"}</h2>
     <p>${directTrack
-      ? "Start med det samme, eller giv dig selv 10 sekunder til at lægge telefonen fra dig, før stemmen går i gang."
-      : "Vælg en øvelse. Start med det samme, eller giv dig selv 10 sekunder til at finde ro, før stemmen går i gang."}</p>
+      ? "Start med det samme, eller vælg 10 sekunder, så du kan lægge telefonen fra dig, før stemmen begynder."
+      : "Vælg en øvelse. Start med det samme, eller vælg 10 sekunder, så du kan lægge telefonen fra dig, før stemmen begynder."}</p>
     ${showTrackPicker ? `
       <div class="guided-audio-grid">
         ${guidedAudioTracks.map(track => `
@@ -1941,7 +1941,7 @@ function openGuidedAudioModal(preselectedTrackId = null) {
         <div class="guided-player-title-wrap">
           <span id="guidedAudioIcon" class="guided-player-icon" aria-hidden="true">${directTrack?.icon || "🎧"}</span>
           <div>
-            <p class="guided-player-kicker">${directTrack ? "Lydøvelse" : "Valgt lydøvelse"}</p>
+            <p class="guided-player-kicker">Lydøvelse</p>
             <h3 id="guidedAudioTitle">${directTrack?.label || "Vælg en lydøvelse"}</h3>
           </div>
         </div>
@@ -1963,7 +1963,7 @@ function openGuidedAudioModal(preselectedTrackId = null) {
         <button class="secondary-button" id="guidedRestartBtn" type="button" disabled>Start forfra</button>
         <button class="ghost-button" id="guidedStopBtn" type="button" disabled>Stop</button>
       </div>
-      <p id="guidedAudioStatus" class="guided-player-status">${directTrack ? "Klar til afspilning." : "Ingen lyd valgt endnu."}</p>
+      <p id="guidedAudioStatus" class="guided-player-status">${directTrack ? "Klar til at starte." : "Ingen lyd valgt endnu."}</p>
     </section>
   `);
 
@@ -1987,18 +1987,18 @@ function openGuidedAudioModal(preselectedTrackId = null) {
 
 function openSleepCalc() {
   openModal(`
-    <p class="eyebrow">Søvnvindue</p>
-    <h2 id="modalTitle">Hvornår skal du stå op?</h2>
-    <p>En søvncyklus varer ca. 90 min. Skriv hvornår du gerne vil vågne, og få forslag til hvornår du helst skal falde i søvn.</p>
+    <p class="eyebrow">Forslag til sengetid</p>
+    <h2 id="modalTitle">Hvornår kan du gå i seng?</h2>
+    <p>Skriv, hvornår du vil stå op. Du får nogle grove forslag til sengetid. Søvncyklusser varierer, så tiderne er ikke en facitliste.</p>
     <div class="sleep-calc-row">
       <label style="flex:1">
-        <span style="font-weight:760;display:block;margin-bottom:6px">Ønsket opvågningstid</span>
+        <span style="font-weight:760;display:block;margin-bottom:6px">Det tidspunkt du vil stå op</span>
         <input type="time" id="calcWakeTime" style="width:100%" />
       </label>
       <button class="primary-button" id="calcBtn" type="button" style="margin-top:22px">Beregn</button>
     </div>
     <div id="calcResult" class="calc-result"></div>
-    <p style="color:var(--muted);font-size:.88rem;margin-top:14px">Husk at lægge ca. 15 min. til at falde i søvn.</p>
+    <p style="color:var(--muted);font-size:.88rem;margin-top:14px">Beregningen regner med cirka 15 minutter til at falde i søvn. Brug tiderne som et groft forslag.</p>
   `);
 
   $("#calcBtn")?.addEventListener("click", () => {
@@ -2016,12 +2016,12 @@ function openSleepCalc() {
     const calcResult = $("#calcResult");
     if (!calcResult) return;
     calcResult.innerHTML = `
-      <p style="margin:14px 0 8px;font-weight:760">Læg dig senest:</p>
+      <p style="margin:14px 0 8px;font-weight:760">Forslag til, hvornår du kan gå i seng:</p>
       <div class="calc-options">
         ${results.map(r => `
           <div class="calc-option">
             <strong>${r.time}</strong>
-            <small>${r.cycles} cyklusser · ca. ${r.cycles * 1.5} timer</small>
+            <small>Ca. ${r.cycles * 1.5} timers søvn</small>
           </div>
         `).join("")}
       </div>
@@ -2034,13 +2034,13 @@ function openSleepCalc() {
 function openThoughtParking() {
   openModal(`
     <p class="eyebrow">Tankemylder</p>
-    <h2 id="modalTitle">Parkér tankerne</h2>
-    <p>Skriv stikord. Ikke løsninger. Bare en parkeringsplads til i morgen.</p>
+    <h2 id="modalTitle">Skriv tankerne ned</h2>
+    <p>Skriv kort, hvad du vil huske eller tage dig af i morgen. Du behøver ikke løse det nu.</p>
     <div class="thought-box">
-      <textarea id="thoughtText" placeholder="Fx: Ring til kommunen. Husk medicin. Bekymring om arbejde."></textarea>
+      <textarea id="thoughtText" placeholder="Fx: Ring til kommunen. Husk medicin. Tal om bekymringen på arbejdet."></textarea>
       <button class="primary-button" id="clearThoughtText" type="button">Tøm feltet</button>
     </div>
-    <p>Når tanken kommer tilbage: "Den er parkeret. Den skal ikke løses i nat."</p>
+    <p>Når tanken kommer tilbage, kan du sige til dig selv: "Jeg har skrevet den ned. Jeg tager den i morgen."</p>
   `);
   $("#clearThoughtText")?.addEventListener("click", () => {
     const thoughtText = $("#thoughtText");
