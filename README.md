@@ -25,7 +25,7 @@ Under **Settings → Pages** vælges:
 
 ## Opdatering
 
-Aktuel version: **2.3.1**
+Aktuel version: **2.3.2**
 
 Når appen ændres, skal samme versionsnummer opdateres disse steder:
 
@@ -61,6 +61,13 @@ Indtil filerne lægges ind, bruger appen de tidligere genererede lyde som midler
 - `sw.js` – offline-cache og opdatering
 - `assets/` – ikoner, favicons og lydfiler
 
+
+## Ændringer i 2.3.2
+
+- Kortene under **Nu** holder sig nu inden for skærmens bredde på mobil.
+- To kolonner deler altid den samme bredde som boksen ovenover.
+- Lange danske ord kan brydes pænt, så de ikke presser gitteret ud over skærmen.
+- Vandret scrolling er fjernet defensivt på hele appen.
 
 ## Ændringer i 2.3.1
 

@@ -39,6 +39,17 @@ body {
   color: var(--text);
   background: transparent;
 }
+
+html, body {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+.app-shell, main, .screen {
+  min-width: 0;
+  max-width: 100%;
+}
 html.overlay-open,
 body.overlay-open {
   overflow: hidden;
@@ -334,7 +345,7 @@ main { padding: 10px 16px 24px; }
 }
 .step-actions { grid-column: 1 / -1; display: flex; justify-content: space-between; gap: 10px; }
 
-.mini-tools { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 14px; }
+.mini-tools { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-top: 14px; width: 100%; max-width: 100%; }
 .tool-card {
   border: 1px solid var(--line);
   border-radius: 24px;
@@ -344,10 +355,13 @@ main { padding: 10px 16px 24px; }
   padding: 16px;
   text-align: left;
   min-height: 124px;
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
 }
-.tool-card span { display: inline-flex; padding: 5px 10px; border-radius: 999px; background: rgba(100,140,175,.18); color: var(--blue-deep); font-weight: 760; margin-bottom: 13px; }
-.tool-card strong { display: block; font-size: 1.08rem; }
-.tool-card small { color: var(--muted); display: block; margin-top: 5px; }
+.tool-card span { display: inline-flex; max-width: 100%; padding: 5px 10px; border-radius: 999px; background: rgba(100,140,175,.18); color: var(--blue-deep); font-weight: 760; margin-bottom: 13px; white-space: normal; overflow-wrap: anywhere; }
+.tool-card strong { display: block; max-width: 100%; font-size: 1.08rem; line-height: 1.22; hyphens: auto; overflow-wrap: anywhere; }
+.tool-card small { color: var(--muted); display: block; max-width: 100%; margin-top: 5px; line-height: 1.35; overflow-wrap: anywhere; }
 
 .guide-list { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
 .guide-card { border-radius: 26px; padding: 18px; }
@@ -855,7 +869,7 @@ main { padding: 10px 16px 24px; }
 .reminder-limit-note { margin: 4px 0 0; color: var(--muted); font-size: .84rem; line-height: 1.45; }
 
 /* ─── MINI-TOOLS: 2x2 GRID ───────────────────────────────────────────────── */
-.mini-tools { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 14px; }
+.mini-tools { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-top: 14px; width: 100%; max-width: 100%; }
 
 /* ─── BREATHING MODAL ────────────────────────────────────────────────────── */
 .breath-technique-grid { display: grid; gap: 10px; margin: 14px 0; }
@@ -1205,4 +1219,23 @@ main { padding: 10px 16px 24px; }
 @media (max-width: 760px) {
   .topic-grid { grid-template-columns: 1fr; }
   .topic-card { min-height: 150px; }
+}
+
+/* v2.3.2 – mobilbredde: kortgitter må aldrig udvide siden */
+@media (max-width: 560px) {
+  .mini-tools {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .tool-card {
+    min-width: 0;
+    width: 100%;
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 340px) {
+  .mini-tools { grid-template-columns: 1fr; }
 }
