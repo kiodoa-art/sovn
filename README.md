@@ -1,23 +1,44 @@
-# Søvnro
+# Nattero
 
-Lille statisk PWA til patienter med søvnproblemer.
+**Hjælp til bedre søvn**
+
+Nattero er en lille statisk PWA på dansk med rolige lydøvelser, konkrete søvnråd, søvnplan, påmindelse og søvndagbog.
+
+## Teknologi
+
+Appen er bygget med almindelig HTML, CSS og vanilla JavaScript. Den kræver ingen backend, konto eller eksterne biblioteker.
+
+- Søvnplan, tjekliste og streak gemmes lokalt i `localStorage`.
+- Søvndagbogen gemmes lokalt i `IndexedDB`.
+- Ingen brugerdata sendes ud af browseren.
+- Lydfiler og app-ikoner ligger lokalt i `assets/`.
 
 ## Upload til GitHub Pages
 
-Upload alle filer i denne mappe til roden af dit GitHub repository.
+Pak zip-filen ud, og upload alle filer direkte til roden af repositoryet. `index.html` skal kunne ses på repositoryets forside.
 
-Appen bruger ingen backend og sender ingen data. Søvnplanen gemmes kun lokalt i browserens localStorage.
+Under **Settings → Pages** vælges:
+
+- **Source:** Deploy from a branch
+- **Branch:** `main`
+- **Folder:** `/(root)`
 
 ## Opdatering
 
-Når du ændrer appen, så bump versionsnummeret i:
+Aktuel version: **2.0.0**
 
-- query-strings til CSS og JavaScript i `index.html`
+Når appen ændres, skal samme versionsnummer opdateres disse steder:
+
+- query-strings til `styles.css` og `app.js` i `index.html`
 - `CACHE_VERSION` og filreferencernes query-strings i `sw.js`
 
-Det får installerede PWA-versioner til at hente ny cache og vise opdateringsbanner.
+Det sikrer, at installerede PWA-versioner henter den nye cache. Service workeren aktiveres automatisk, hvorefter appen genindlæses.
 
+## Projektstruktur
 
-## Ændringer i v1.0.4
-- Opdateringsbjælken er fjernet helt fra HTML/CSS.
-- Illustrationerne i fanen “Nu” er fjernet helt.
+- `index.html` – appens indhold og struktur
+- `styles.css` – design og mobilvisning
+- `app.js` – navigation, værktøjer, lyd, søvnplan og søvndagbog
+- `manifest.webmanifest` – PWA-navn, farver og ikoner
+- `sw.js` – offline-cache og opdatering
+- `assets/` – ikoner, favicons og lydfiler

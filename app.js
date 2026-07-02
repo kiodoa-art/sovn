@@ -1,11 +1,15 @@
-const PLAN_KEY = "soevnro.sleepPlan.v1";
-const CHECKLIST_KEY = "soevnro.eveningChecklist.v1";
-const DIARY_KEY = "soevnro.diary.v1";
-const STREAK_KEY = "soevnro.streak.v1";
+const APP_NAME = "Nattero";
+const STORAGE_NAMESPACE = "nattero";
 
-const DIARY_DB_NAME = "soevnro";
+const PLAN_KEY = `${STORAGE_NAMESPACE}.sleepPlan.v1`;
+const CHECKLIST_KEY = `${STORAGE_NAMESPACE}.eveningChecklist.v1`;
+const LEGACY_DIARY_KEY = `${STORAGE_NAMESPACE}.diary.v1`;
+const STREAK_KEY = `${STORAGE_NAMESPACE}.streak.v1`;
+
+const DIARY_DB_NAME = STORAGE_NAMESPACE;
 const DIARY_DB_VERSION = 1;
 const DIARY_STORE = "diaryEntries";
+
 let diaryDbPromise = null;
 let diaryMigrationPromise = null;
 let reminderTimeoutId = null;
@@ -434,7 +438,7 @@ async function playSound(id) {
     return { ok: true, playing: true };
   } catch (error) {
     stopSound();
-    console.warn("Søvnro kunne ikke starte lyd:", error);
+    console.warn(`${APP_NAME} kunne ikke starte lyd:`, error);
     return {
       ok: false,
       playing: false,
@@ -691,7 +695,7 @@ function setupReminder() {
     try {
       permission = await Notification.requestPermission();
     } catch (error) {
-      console.warn("Søvnro kunne ikke anmode om påmindelsestilladelse:", error);
+      console.warn(`${APP_NAME} kunne ikke anmode om påmindelsestilladelse:`, error);
       status.textContent = "Påmindelser kunne ikke aktiveres i denne browser.";
       return;
     }
@@ -708,12 +712,12 @@ function setupReminder() {
     reminderTimeoutId = setTimeout(() => {
       reminderTimeoutId = null;
       try {
-        new Notification("Søvnro – Sengetid 🌙", {
+        new Notification(`${APP_NAME} – Sengetid 🌙`, {
           body: "Det er snart tid til at finde ro og gøre klar til at sove.",
           icon: "assets/icon-192.png"
         });
       } catch (error) {
-        console.warn("Søvnro kunne ikke vise påmindelsen:", error);
+        console.warn(`${APP_NAME} kunne ikke vise påmindelsen:`, error);
       }
     }, msUntil);
 
@@ -771,7 +775,7 @@ async function migrateDiaryFromLocalStorage(db) {
   diaryMigrationPromise = (async () => {
     let rawEntries;
     try {
-      rawEntries = localStorage.getItem(DIARY_KEY);
+      rawEntries = localStorage.getItem(LEGACY_DIARY_KEY);
     } catch (error) {
       console.warn("Den gamle localStorage-dagbog kunne ikke tilgås:", error);
       return;
@@ -787,7 +791,7 @@ async function migrateDiaryFromLocalStorage(db) {
     }
 
     if (!Array.isArray(entries) || entries.length === 0) {
-      try { localStorage.removeItem(DIARY_KEY); } catch (_) {}
+      try { localStorage.removeItem(LEGACY_DIARY_KEY); } catch (_) {}
       return;
     }
 
@@ -795,7 +799,7 @@ async function migrateDiaryFromLocalStorage(db) {
     const store = transaction.objectStore(DIARY_STORE);
     entries.filter(entry => entry?.date).forEach(entry => store.put(entry));
     await waitForTransaction(transaction);
-    try { localStorage.removeItem(DIARY_KEY); } catch (_) {}
+    try { localStorage.removeItem(LEGACY_DIARY_KEY); } catch (_) {}
   })().catch(error => {
     diaryMigrationPromise = null;
     throw error;
@@ -835,7 +839,7 @@ async function clearDiaryEntries() {
   const transaction = db.transaction(DIARY_STORE, "readwrite");
   transaction.objectStore(DIARY_STORE).clear();
   await waitForTransaction(transaction);
-  try { localStorage.removeItem(DIARY_KEY); } catch (_) {}
+  try { localStorage.removeItem(LEGACY_DIARY_KEY); } catch (_) {}
 }
 
 function calcSleepHours(bedTime, wakeTime) {
@@ -1438,7 +1442,7 @@ async function startGuidedAudio(mode = "now") {
     audio.currentTime = startAt;
     await audio.play();
   } catch (error) {
-    console.warn("Søvnro kunne ikke starte lydøvelsen:", error);
+    console.warn(`${APP_NAME} kunne ikke starte lydøvelsen:`, error);
     guidedAudioError = "Lydøvelsen kunne ikke startes. Tryk igen, eller tjek telefonens lydindstillinger.";
     syncGuidedAudioUI();
     return;
@@ -1460,7 +1464,7 @@ async function toggleGuidedAudioPlayback() {
       audio.pause();
     }
   } catch (error) {
-    console.warn("Søvnro kunne ikke fortsætte lydøvelsen:", error);
+    console.warn(`${APP_NAME} kunne ikke fortsætte lydøvelsen:`, error);
     guidedAudioError = "Lydøvelsen kunne ikke fortsætte. Tryk igen, eller prøv at skrue op for lyden.";
     syncGuidedAudioUI();
   }
@@ -1475,7 +1479,7 @@ async function restartGuidedAudio() {
     audio.currentTime = GUIDED_AUDIO_PREROLL;
     await audio.play();
   } catch (error) {
-    console.warn("Søvnro kunne ikke starte lydøvelsen forfra:", error);
+    console.warn(`${APP_NAME} kunne ikke starte lydøvelsen forfra:`, error);
     guidedAudioError = "Lydøvelsen kunne ikke startes forfra på denne enhed.";
     syncGuidedAudioUI();
   }
@@ -1709,7 +1713,9 @@ function setupServiceWorker() {
         if (nw.state === "installed" && navigator.serviceWorker.controller) nw.postMessage({ type: "SKIP_WAITING" });
       });
     });
-  }).catch(() => {});
+  }).catch(error => {
+    console.warn(`${APP_NAME} kunne ikke registrere service worker:`, error);
+  });
   navigator.serviceWorker.addEventListener("controllerchange", () => window.location.reload());
 }
 
@@ -1746,6 +1752,7 @@ function setupEvents() {
       const guide = guidesData.find(item => item.id === guideButton.dataset.guide);
       const topic = guideTopics.find(item => getTopicItems(item.id).some(guideItem => guideItem.id === guide?.id));
       if (topic) requestAnimationFrame(() => openGuideTopic(topic.id, guideButton));
+      return;
     }
   });
 

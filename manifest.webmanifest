@@ -1,13 +1,20 @@
 {
-  "name": "Søvnro – Lille guide til ro og søvn",
-  "short_name": "Søvnro",
-  "description": "En lille patientguide til søvn, ro og døgnrytme.",
-  "start_url": "./index.html",
+  "id": "./",
+  "name": "Nattero – hjælp til bedre søvn",
+  "short_name": "Nattero",
+  "description": "Rolige øvelser, konkrete råd, søvnplan og søvndagbog til bedre søvn.",
+  "lang": "da",
+  "dir": "ltr",
+  "start_url": "./",
   "scope": "./",
   "display": "standalone",
+  "orientation": "portrait-primary",
   "background_color": "#111720",
   "theme_color": "#111720",
-  "orientation": "portrait-primary",
+  "categories": [
+    "health",
+    "lifestyle"
+  ],
   "icons": [
     {
       "src": "assets/icon-192.png",
