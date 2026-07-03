@@ -1,0 +1,76 @@
+# Nattero
+
+**Hjælp til bedre søvn**
+
+Nattero er en lille statisk PWA på dansk med rolige lydøvelser, letforståelige søvnråd, søvnplan, påmindelse og søvndagbog.
+
+## Teknologi
+
+Appen er bygget med almindelig HTML, CSS og vanilla JavaScript. Den kræver ingen backend, konto eller eksterne biblioteker.
+
+- Søvnplan, tjekliste og streak gemmes lokalt i `localStorage`.
+- Søvndagbogen gemmes lokalt i `IndexedDB`.
+- Ingen brugerdata sendes ud af browseren.
+- Lydfiler og app-ikoner ligger lokalt i `assets/`.
+
+## Upload til GitHub Pages
+
+Pak zip-filen ud, og upload alle filer direkte til roden af repositoryet. `index.html` skal kunne ses på repositoryets forside.
+
+Under **Settings → Pages** vælges:
+
+- **Source:** Deploy from a branch
+- **Branch:** `main`
+- **Folder:** `/(root)`
+
+## Opdatering
+
+Aktuel version: **2.3.2**
+
+Når appen ændres, skal samme versionsnummer opdateres disse steder:
+
+- query-strings til `styles.css` og `app.js` i `index.html`
+- `CACHE_VERSION` og filreferencernes query-strings i `sw.js`
+
+Det sikrer, at installerede PWA-versioner henter den nye cache. Service workeren aktiveres automatisk, hvorefter appen genindlæses.
+
+## Sprog og målgruppe
+
+Teksterne er skrevet i et enkelt, voksent hverdagssprog til brugere fra cirka 20 til 60 år. Fagudtryk er så vidt muligt erstattet eller forklaret direkte.
+
+## Forsidens lydvalg
+
+Forsiden har to kompakte fold-ud-felter: **Baggrundslyde** og **Lydøvelser**. Kun ét felt kan være åbent ad gangen. Et tryk på en konkret lyd åbner direkte i den eksisterende afspiller-popup.
+
+## Baggrundslyde
+
+Baggrundsafspilleren er klargjort til tre MP3-filer i `assets/audio/`:
+
+- `hvid-stoej.mp3`
+- `regn.mp3`
+- `skov.mp3`
+
+Indtil filerne lægges ind, bruger appen de tidligere genererede lyde som midlertidig fallback. Når MP3-filerne tilføjes, bruges de automatisk. Ved den endelige lydopdatering bør filerne også føjes til `APP_SHELL` i `sw.js`, og versionsnummeret skal bumpes igen, så de bliver tilgængelige offline med det samme.
+
+## Projektstruktur
+
+- `index.html` – appens indhold og struktur
+- `styles.css` – design og mobilvisning
+- `app.js` – navigation, værktøjer, lyd, søvnplan og søvndagbog
+- `manifest.webmanifest` – PWA-navn, farver og ikoner
+- `sw.js` – offline-cache og opdatering
+- `assets/` – ikoner, favicons og lydfiler
+
+
+## Ændringer i 2.3.2
+
+- Kortene under **Nu** holder sig nu inden for skærmens bredde på mobil.
+- To kolonner deler altid den samme bredde som boksen ovenover.
+- Lange danske ord kan brydes pænt, så de ikke presser gitteret ud over skærmen.
+- Vandret scrolling er fjernet defensivt på hele appen.
+
+## Ændringer i 2.3.1
+
+- Installer-knappen er flyttet til bunden af sidemenuen.
+- Knappen skjules automatisk, når appen allerede er installeret.
+- På iPhone og iPad vises en kort installationsvejledning til Safari.
